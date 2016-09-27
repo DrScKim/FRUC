@@ -1,6 +1,8 @@
 #ifndef __FRAMEINTERPOL_H__
 #define __FRAMEINTERPOL_H__
 #include <iostream>
+#include <omp.h>
+
 
 typedef unsigned char	uchar;
 class FrameInterpolation {
@@ -12,6 +14,7 @@ class FrameInterpolation {
 	int* m_occ_n_hole_Mask;
 
 public:
+	FrameInterpolation(){}
 	FrameInterpolation(int width, int height): m_FMVX(NULL), m_FMVY(NULL), m_BMVX(NULL), m_BMVY(NULL), m_occ_n_hole_Mask(NULL) {
 		init(width, height);
 	}
@@ -87,8 +90,8 @@ public:
 
 	void reshapeMVMap(int width, int height, int frameInterval,
 		uchar* forward_mvX, uchar* forward_mvY, uchar* backward_mvX, uchar* backward_mvY) {
-#pragma omp parallel_for_
 		int idx = 0;
+		#pragma omp parallel for
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				m_FMVX[idx + x] = (forward_mvX[idx + x] - 128) / frameInterval;

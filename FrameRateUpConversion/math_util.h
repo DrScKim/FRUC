@@ -34,7 +34,7 @@ inline float calcSADF(const uint8* src, const uint8* dst, int blkW, int blkH, in
 
 	return sad/(float)(blkW*blkH);
 }
-double getPSNRFrame(const Mat& I1, const Mat& I2)
+inline double getPSNRFrame(const Mat& I1, const Mat& I2)
 {
 	Mat s1;
 	absdiff(I1, I2, s1);       // |I1 - I2|

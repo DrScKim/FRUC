@@ -6,7 +6,7 @@
 #include <direct.h>
 #include "FrameInfo.h"
 #include "FrameInterpolation.h"
-class FRUC
+class FrameRateUpConverter
 {
 	Mat curFrame;
 	Mat nextFrame;
@@ -25,9 +25,10 @@ class FRUC
 	FrameInterpolation interpolator;
 public:
 	
-	FRUC() : m_file_idx(0), m_frame_interval(2), m_overlap_size(2) {
+	FrameRateUpConverter() : m_file_idx(0), m_frame_interval(2), m_overlap_size(2) {
+
 	}
-	~FRUC() {
+	~FrameRateUpConverter() {
 		if (curFrame.data)
 			curFrame.release();
 		if (nextFrame.data)

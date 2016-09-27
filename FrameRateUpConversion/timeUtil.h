@@ -30,7 +30,7 @@ struct functor
 	}
 };
 
-void func()
+static void func()
 {
 	std::cout << "In function, run for ";
 }

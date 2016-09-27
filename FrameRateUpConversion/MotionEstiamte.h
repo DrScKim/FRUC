@@ -13,7 +13,7 @@
 
 #define ERROR_NO_ALIGN_MACROBLOCKS	1
 #define ERROR_NOT_AVAILABLE_MACROBLOCK_SIZE	2
-
+typedef unsigned char uint8_t;
 class MotionEstimator {
 	std::vector<MacroBlockData> m_mbs;
 	int m_nBlkX;
