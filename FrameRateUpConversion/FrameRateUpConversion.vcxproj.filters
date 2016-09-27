@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Macroblock">
+      <UniqueIdentifier>{0ef10995-30a3-4394-90b1-57a3e3b1ca29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util">
+      <UniqueIdentifier>{aaa076eb-1258-41da-924f-66520da24e03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Estimate">
+      <UniqueIdentifier>{35416d78-735b-4671-bfae-e66401161ccc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="player">
+      <UniqueIdentifier>{e684551e-1a96-4284-9c94-f727e1f35bc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="analysis">
+      <UniqueIdentifier>{66e24733-a083-4e8d-a161-d94b4ff7d1b2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="macroblock.h">
+      <Filter>Macroblock</Filter>
+    </ClInclude>
+    <ClInclude Include="motionvector.h">
+      <Filter>Macroblock</Filter>
+    </ClInclude>
+    <ClInclude Include="me_util.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="math_util.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="MotionEstiamte.h">
+      <Filter>Estimate</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoIO.h">
+      <Filter>player</Filter>
+    </ClInclude>
+    <ClInclude Include="FRUC.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interpolation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="unidirectional.h">
+      <Filter>Estimate</Filter>
+    </ClInclude>
+    <ClInclude Include="timeUtil.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="MatUtil.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="TrainDataGenerator.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="MVDiff.h">
+      <Filter>analysis</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameRateUpConversion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
