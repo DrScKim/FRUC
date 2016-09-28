@@ -34,9 +34,15 @@ public:
 		if (nextFrame.data)
 			nextFrame.release();
 	}
-	void setup(int blkW, int blkH, int searchRange, int frame_interval,
+	void setup(int blkW, int blkH, int searchRange, int frame_interval, int overlap_size,
 		int files_start_idx, char* load_dir, char* save_dir, char* file_ext) {
 		frameInfo.initialize(blkW, blkH, searchRange);
+		m_file_idx = files_start_idx;
+		m_frame_interval = frame_interval;
+		m_overlap_size = overlap_size;
+		sprintf(save_directory, save_dir);
+		sprintf(load_directory, load_dir);
+		sprintf(save_extension, file_ext);
 	}
 	void path_setup(int idx) {
 		sprintf(curFrame_path, "%s/%d.%s", load_directory, idx, save_extension);
@@ -44,24 +50,27 @@ public:
 		sprintf(nextFrame_path, "%s/%d.%s", load_directory, idx + 2, save_extension);
 	}
 	void do_fruc() {
-		int file_idx = m_file_idx;
-		path_setup(file_idx);
+		path_setup(m_file_idx);
 		curFrame = imread(curFrame_path);
 		nextFrame = imread(nextFrame_path);
-		while (curFrame.data != NULL || nextFrame.data != NULL) {
+		interpolator.init(curFrame.cols, curFrame.rows);
+		while (curFrame.data != NULL && nextFrame.data != NULL) {
 			Mat interpol = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
-			int nCols, nRows;
+			int nCols = curFrame.cols/frameInfo.getBlkWidth(), nRows = curFrame.rows/frameInfo.getBlkHeight();
+			frameInfo.motion_estimate(curFrame, nextFrame);
 			Mat mvfx = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, true, true, 0.5);
 			Mat mvfy = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, true, false, 0.5);
 			Mat mvbx = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, false, true, 0.5);
 			Mat mvby = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, false, false, 0.5);
-			frameInfo.motion_estimate(curFrame, nextFrame);
 			interpolator.interpolation(interpol.data, frameInfo.getCurYFrameData(), frameInfo.getNextYFrameData(),
 				mvfx.data, mvfy.data, mvbx.data, mvby.data, curFrame.cols, curFrame.rows,
 				frameInfo.getBlkWidth(), frameInfo.getBlkHeight(), m_frame_interval, m_overlap_size);
 			imwrite(interpol_path, interpol);
-			file_idx += m_frame_interval;
-			path_setup(file_idx);
+			m_file_idx += m_frame_interval;
+			path_setup(m_file_idx);
+			cout << "Frame Interpolated :: "<<m_file_idx << endl;
+			curFrame = imread(curFrame_path);
+			nextFrame = imread(nextFrame_path);
 		}
 	
 	}

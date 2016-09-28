@@ -155,6 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FrameInterpolation.h" />
+    <ClInclude Include="FRUC_tester.h" />
     <ClInclude Include="MatUtil.h" />
     <ClInclude Include="FrameInfo.h" />
     <ClInclude Include="Interpolation.h" />

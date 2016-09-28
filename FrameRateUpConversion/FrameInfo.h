@@ -39,6 +39,7 @@ public:
 	}
 	uchar* getCurYFrameData() { return curYframe.data; }
 	uchar* getNextYFrameData() { return nextYframe.data; }
+
 	void motion_estimate(Mat& curFrame, Mat& nextFrame, bool forward=true, bool backward=true) {
 		curYframe = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
 		nextYframe = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
@@ -48,17 +49,18 @@ public:
 		ColorConverter::YUV2Y(curYUVFrame, curYframe);
 		ColorConverter::YUV2Y(nextYUVFrame, nextYframe);
 		int nBlkX = curYframe.cols / m_blkW;
-		int nBlkY = curYframe.rows / m_blkH;		
-		m_forward_mv.initBlock(nBlkX, nBlkY);
-		m_backward_mv.initBlock(nBlkX, nBlkY);
+		int nBlkY = curYframe.rows / m_blkH;
 		m_forward_mv.reset();
 		m_backward_mv.reset();
+		m_forward_mv.initBlock(nBlkX, nBlkY);
+		m_backward_mv.initBlock(nBlkX, nBlkY);
+		
 		const clock_t begin_time = clock();
 		if (forward)
 			m_forward_mv.estimate(curYframe.data, nextYframe.data, curYframe.cols, curYframe.rows, m_blkW, m_blkH, m_searchRange);
 		if (backward)
 			m_backward_mv.estimate(nextYframe.data, curYframe.data, nextYframe.cols, nextYframe.rows, m_blkW, m_blkH, m_searchRange);
-
+		
 		std::cout << "Elapsed: " << float(clock() - begin_time) / CLOCKS_PER_SEC << std::endl;;
 	}
 

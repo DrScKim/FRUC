@@ -57,9 +57,6 @@
     <ClInclude Include="VideoIO.h">
       <Filter>player</Filter>
     </ClInclude>
-    <ClInclude Include="FRUC.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Interpolation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -78,6 +75,15 @@
     <ClInclude Include="MVDiff.h">
       <Filter>analysis</Filter>
     </ClInclude>
+    <ClInclude Include="FrameInterpolation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FRUC_tester.h">
+      <Filter>util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -85,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="FrameRateUpConversion.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FRUC.h">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

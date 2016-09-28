@@ -26,16 +26,26 @@ public:
 		if (m_occ_n_hole_Mask) delete[] m_occ_n_hole_Mask;
 	}
 	void init(int width, int height) {
-		m_FMVX = new int[width * height];
-		m_FMVY = new int[width * height];
-		m_BMVX = new int[width * height];
-		m_BMVY = new int[width * height];
-		m_occ_n_hole_Mask = new int[width * height];
+		if (!m_FMVX)
+			m_FMVX = new int[width * height];
+		if (!m_FMVY)
+			m_FMVY = new int[width * height];
+		if (!m_BMVX)
+			m_BMVX = new int[width * height];
+		if (!m_BMVY)
+			m_BMVY = new int[width * height];
+		if (!m_occ_n_hole_Mask)
+			m_occ_n_hole_Mask = new int[width * height];
 		memset(m_occ_n_hole_Mask, 0, width*height*sizeof(int));
 		memset(m_FMVX, 0, width*height*sizeof(int));
 		memset(m_FMVX, 0, width*height*sizeof(int));
 		memset(m_BMVX, 0, width*height*sizeof(int));
 		memset(m_BMVY, 0, width*height*sizeof(int));
+	}
+
+	void overlap_set_pel(int out_idx, int ref_idx, uchar* ref_frame, int overlapsize) {
+		
+	
 	}
 
 	void interpolation(uchar* OUT_interpolFrame, uchar* prevFrame, uchar* nextFrame,
@@ -47,14 +57,34 @@ public:
 		int idx = 0;
 		for (int y = 0; y < frameHeight; y++) {
 			for (int x = 0; x < frameWidth; x++) {
-				int bmx = m_BMVX[idx + x];
-				int bmy = m_BMVY[idx + x];
-				int fmx = m_FMVX[idx + x];
-				int fmy = m_FMVY[idx + x];
-				int b_idx = x + bmx + (y + bmy)*frameWidth;
-				int f_idx = x + fmx + (y + bmy)*frameWidth;
-				OUT_interpolFrame[b_idx] += (prevFrame[idx + x] >> 1) / m_occ_n_hole_Mask[b_idx];
-				OUT_interpolFrame[f_idx] += (nextFrame[idx + x] >> 1) / m_occ_n_hole_Mask[f_idx];
+				int bmx = x+m_BMVX[idx + x];
+				int bmy = y+m_BMVY[idx + x];
+				int fmx = x+m_FMVX[idx + x];
+				int fmy = y+m_FMVY[idx + x];
+				if (!((bmx < 0 || bmx >= frameWidth) || (fmy < 0 || fmy >= frameHeight))) {
+					int b_idx = bmx + (fmy)*frameWidth;
+					if (m_occ_n_hole_Mask[idx+x] != 0)
+						//OUT_interpolFrame[b_idx] += ((prevFrame[idx + x] >> 1) / m_occ_n_hole_Mask[b_idx]);
+						OUT_interpolFrame[idx + x] = prevFrame[b_idx] / m_occ_n_hole_Mask[idx+x];
+					else {
+						//OUT_interpolFrame[b_idx] += (prevFrame[b_idx] >> 1) + (nextFrame[b_idx] >> 1);
+					}
+				}
+					
+
+				if (!((fmx < 0 || fmx >= frameWidth) || (fmy < 0 || fmy >= frameHeight))) {
+					int f_idx = fmx + (fmy)*frameWidth;
+					if (m_occ_n_hole_Mask[idx + x] != 0) {
+						OUT_interpolFrame[idx + x] = nextFrame[f_idx] / m_occ_n_hole_Mask[idx + x];
+					}
+						//OUT_interpolFrame[f_idx] += ((nextFrame[idx + x] >> 1) / m_occ_n_hole_Mask[f_idx]);
+					else {
+						//OUT_interpolFrame[f_idx] = (nextFrame[f_idx] >> 1) + (prevFrame[f_idx] >> 1);
+					}
+				}
+					
+
+				
 			}
 			idx += frameWidth;
 		}
@@ -64,7 +94,7 @@ public:
 		
 	};
 	void occ_n_hole_Mask(int width, int height, int frameinterval, int overlapsize=0) {
-		
+		memset(m_occ_n_hole_Mask, 0, width*height*sizeof(int));
 		int idx = 0;
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -72,13 +102,13 @@ public:
 				int fy = y + m_FMVY[idx + x];
 				int bx = x + m_BMVX[idx + x];
 				int by = y + m_BMVY[idx + x];
-				if ((fx - overlapsize < 0 && fx + overlapsize >= width) ||
-					(fy - overlapsize < 0 && fy + overlapsize >= height)) {
+				if ((fx - overlapsize >= 0 && fx + overlapsize < width) &&
+					(fy - overlapsize >= 0 && fy + overlapsize < height)) {
 					int fidx = fx + fy * width;
 					m_occ_n_hole_Mask[fidx]++;
 				}
-				if ((bx - overlapsize < 0 && bx + overlapsize >= width) ||
-					(by - overlapsize < 0 && by + overlapsize >= height)) {
+				if ((bx - overlapsize >= 0 && bx + overlapsize < width) &&
+					(by - overlapsize >= 0 && by + overlapsize < height)) {
 					int bidx = bx + by * width;
 					m_occ_n_hole_Mask[bidx]++;
 				}
@@ -91,7 +121,7 @@ public:
 	void reshapeMVMap(int width, int height, int frameInterval,
 		uchar* forward_mvX, uchar* forward_mvY, uchar* backward_mvX, uchar* backward_mvY) {
 		int idx = 0;
-		#pragma omp parallel for
+//#pragma omp parallel for
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				m_FMVX[idx + x] = (forward_mvX[idx + x] - 128) / frameInterval;
