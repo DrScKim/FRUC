@@ -7,7 +7,7 @@
 
 typedef unsigned char BYTE;
 
-class SGFRUC_FBClassifier
+class FBClassifier
 {
 private:
 	int* m_table;
@@ -36,8 +36,8 @@ private:
 		dst = tmp;
 	}
 public:
-	SGFRUC_FBClassifier() : m_table(NULL), m_uvTable(NULL){}
-	~SGFRUC_FBClassifier() {
+	FBClassifier() : m_table(NULL), m_uvTable(NULL){}
+	~FBClassifier() {
 		if (m_table != NULL)
 			delete[] m_table;
 		if (m_uvTable != NULL)
