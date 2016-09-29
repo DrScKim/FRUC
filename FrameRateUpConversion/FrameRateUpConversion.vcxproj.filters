@@ -28,6 +28,12 @@
     <Filter Include="analysis">
       <UniqueIdentifier>{66e24733-a083-4e8d-a161-d94b4ff7d1b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ShotChange">
+      <UniqueIdentifier>{265c47f0-c1c6-4d75-a12b-e42c3bdb59fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FBClassify">
+      <UniqueIdentifier>{16a9ec97-d19c-469d-b06f-6c9e962ea423}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -83,6 +89,18 @@
     </ClInclude>
     <ClInclude Include="FRUC_tester.h">
       <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="ShotChange\LuminanceHisto.h">
+      <Filter>ShotChange</Filter>
+    </ClInclude>
+    <ClInclude Include="FBClassify\FBClassifier.h">
+      <Filter>FBClassify</Filter>
+    </ClInclude>
+    <ClInclude Include="FBClassify\FBClassfyDefine.h">
+      <Filter>FBClassify</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameInterpol_fbClassify.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

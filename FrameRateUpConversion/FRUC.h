@@ -58,42 +58,61 @@ public:
 	}
 	void do_fruc_with_fbclassify() {
 		FrameInterpolation_FBClassify interpolator;
+		FrameInterpolation base_interpolator;
 		FBClassifier fbClassifier;
 		path_setup(m_file_idx);
 		
 		
 		curFrame = imread(curFrame_path);
 		nextFrame = imread(nextFrame_path);
+		interpolator.init(curFrame.cols, curFrame.rows);
 
-
-		Mat prevFrame = imread(prevFrame_path);
-		cvtColor(prevFrame, prevFrame, CV_BGR2YUV);
-		Mat postFrame = imread(postFrame_path);
-		cvtColor(postFrame, postFrame, CV_BGR2YUV);
-		Mat prevYFrame = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0)), 
+		Mat prevYFrame = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0)),
 			postYFrame = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
+		Mat prevFrame = imread(prevFrame_path);
+		Mat postFrame = imread(postFrame_path);
+		/*
+		cvtColor(prevFrame, prevFrame, CV_BGR2YUV);
+		cvtColor(postFrame, postFrame, CV_BGR2YUV);
+		
 		ColorConverter::YUV2Y(prevFrame, prevYFrame);
 		ColorConverter::YUV2Y(postFrame, postYFrame);
-		interpolator.init(curFrame.cols, curFrame.rows);
+		*/
 
 		//first frame
 		if (prevFrame.data == NULL && curFrame.data != NULL && nextFrame.data != NULL) {
-			m_file_idx += m_frame_interval;
+			Mat interpol = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
 			int nCols = curFrame.cols / frameInfo.getBlkWidth(), nRows = curFrame.rows / frameInfo.getBlkHeight();
 			frameInfo.motion_estimate(curFrame, nextFrame);
 			Mat mvfx = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, true, true, 0.5);
 			Mat mvfy = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, true, false, 0.5);
 			Mat mvbx = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, false, true, 0.5);
 			Mat mvby = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, false, false, 0.5);
+			interpolator.basic_interpolation(interpol.data, frameInfo.getCurYFrameData(), frameInfo.getNextYFrameData(),
+				mvfx.data, mvfy.data, mvbx.data, mvby.data, curFrame.cols, curFrame.rows,
+				frameInfo.getBlkWidth(), frameInfo.getBlkHeight(), m_frame_interval, m_overlap_size, fbClassifier, false);
+			imwrite(interpol_path, interpol);
+			//assign frames for next sequnce
+			m_file_idx += m_frame_interval;
+			path_setup(m_file_idx);
+			cout << "Frame Interpolated :: " << m_file_idx << endl;
+			curFrame = imread(curFrame_path);
+			nextFrame = imread(nextFrame_path);
+			prevFrame = imread(prevFrame_path);
+			cvtColor(prevFrame, prevFrame, CV_BGR2YUV);
+			postFrame = imread(postFrame_path);
+			cvtColor(postFrame, postFrame, CV_BGR2YUV);
+			ColorConverter::YUV2Y(prevFrame, prevYFrame);
+			ColorConverter::YUV2Y(postFrame, postYFrame);
 		}
 		// frames exceptr for first and last
 		while (prevFrame.data != NULL && curFrame.data != NULL && nextFrame.data != NULL && postFrame.data != NULL) {
 			Mat interpol = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
 			int nCols = curFrame.cols / frameInfo.getBlkWidth(), nRows = curFrame.rows / frameInfo.getBlkHeight();
 			//classify from forward or backward
+			fbClassifier.setTable(curFrame.cols, curFrame.rows);
 			fbClassifier.classify((const BYTE*)prevYFrame.data, (const BYTE*)frameInfo.getCurYFrameData(), (const BYTE*)frameInfo.getNextYFrameData(), (const BYTE*)postYFrame.data, 
-				curFrame.cols, curFrame.rows, 25, 25);
-			int nCols = curFrame.cols / frameInfo.getBlkWidth(), nRows = curFrame.rows / frameInfo.getBlkHeight();
+				curFrame.cols, curFrame.rows, 5, 3);
 			//motion estimate
 			frameInfo.motion_estimate(curFrame, nextFrame);
 			//motion vector correction
@@ -105,27 +124,21 @@ public:
 			interpolator.basic_interpolation(interpol.data, frameInfo.getCurYFrameData(), frameInfo.getNextYFrameData(),
 				mvfx.data, mvfy.data, mvbx.data, mvby.data, curFrame.cols, curFrame.rows,
 				frameInfo.getBlkWidth(), frameInfo.getBlkHeight(), m_frame_interval, m_overlap_size, fbClassifier, true);
-			
-			//memcpy(prevYFrameData, frameInfo.getCurYFrameData(), curFrame.cols * curFrame.rows * sizeof(uchar));
 			imwrite(interpol_path, interpol);
+			//assign frames for next sequnce
 			m_file_idx += m_frame_interval;
 			path_setup(m_file_idx);
 			cout << "Frame Interpolated :: " << m_file_idx << endl;
 			curFrame = imread(curFrame_path);
 			nextFrame = imread(nextFrame_path);
-			
 			Mat prevFrame = imread(prevFrame_path);
 			cvtColor(prevFrame, prevFrame, CV_BGR2YUV);
 			Mat postFrame = imread(postFrame_path);
 			if (postFrame.data == NULL)
 				break;
 			cvtColor(postFrame, postFrame, CV_BGR2YUV);
-			Mat prevYFrame = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0)),
-				postYFrame = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
-
 			ColorConverter::YUV2Y(prevFrame, prevYFrame);
 			ColorConverter::YUV2Y(postFrame, postYFrame);
-
 		}
 	}
 

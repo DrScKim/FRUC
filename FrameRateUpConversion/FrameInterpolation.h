@@ -12,10 +12,12 @@ protected:
 	int* m_FMVY;
 	int* m_BMVX;
 	int* m_BMVY;
-	int* m_occ_n_hole_Mask;
+	int* m_occ_n_hole_Mask_F;
+	int* m_occ_n_hole_Mask_B;
 
 	void occ_n_hole_Mask(int width, int height, int frameinterval, int blkW, int blkH, int overlapsize = 0) {
-		memset(m_occ_n_hole_Mask, 0, width*height*sizeof(int));
+		memset(m_occ_n_hole_Mask_F, 0, width*height*sizeof(int));
+		memset(m_occ_n_hole_Mask_B, 0, width*height*sizeof(int));
 		int idx = 0;
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -26,11 +28,11 @@ protected:
 				// normal case
 				if ((fx >= 0 && fx < width) && (fy >= 0 && fy < height)) {
 					int fidx = fx + fy * width;
-					m_occ_n_hole_Mask[fidx]++;
+					//m_occ_n_hole_Mask_F[fidx]++;
 				}
 				if ((bx >= 0 && bx < width) && (by >= 0 && by < height)) {
 					int bidx = bx + by * width;
-					m_occ_n_hole_Mask[bidx]++;
+					m_occ_n_hole_Mask_B[bidx]++;
 				}
 
 				//inner block (not edge of block) case or no overlap
@@ -42,8 +44,8 @@ protected:
 				if (!(bx - overlapsize >= 0 && bx + overlapsize < width) ||
 					!(by - overlapsize >= 0 && by + overlapsize < height))
 					continue;
-
-
+				
+				/*
 				// horizontal case of box's edge
 				if (x % blkW == 0) {
 					for (int i = -overlapsize; i < 0; i++) {
@@ -70,6 +72,7 @@ protected:
 						m_occ_n_hole_Mask[bx + (by + j)*width]++;
 					}
 				}
+				*/
 			}
 			idx += width;
 		}
@@ -91,7 +94,8 @@ protected:
 	}
 public:
 	FrameInterpolation(){}
-	FrameInterpolation(int width, int height): m_FMVX(NULL), m_FMVY(NULL), m_BMVX(NULL), m_BMVY(NULL), m_occ_n_hole_Mask(NULL) {
+	FrameInterpolation(int width, int height): m_FMVX(NULL), m_FMVY(NULL), m_BMVX(NULL), m_BMVY(NULL),
+		m_occ_n_hole_Mask_F(NULL), m_occ_n_hole_Mask_B(NULL){
 		init(width, height);
 	}
 	~FrameInterpolation() {
@@ -99,7 +103,8 @@ public:
 		if (m_FMVY) delete[] m_FMVY;
 		if (m_BMVX) delete[] m_BMVX;
 		if (m_BMVY) delete[] m_BMVY;
-		if (m_occ_n_hole_Mask) delete[] m_occ_n_hole_Mask;
+		if (m_occ_n_hole_Mask_F) delete[] m_occ_n_hole_Mask_F;
+		if (m_occ_n_hole_Mask_B) delete[] m_occ_n_hole_Mask_B;
 	}
 	void init(int width, int height) {
 		if (!m_FMVX)
@@ -110,9 +115,12 @@ public:
 			m_BMVX = new int[width * height];
 		if (!m_BMVY)
 			m_BMVY = new int[width * height];
-		if (!m_occ_n_hole_Mask)
-			m_occ_n_hole_Mask = new int[width * height];
-		memset(m_occ_n_hole_Mask, 0, width*height*sizeof(int));
+		if (!m_occ_n_hole_Mask_F)
+			m_occ_n_hole_Mask_F = new int[width * height];
+		if (!m_occ_n_hole_Mask_B)
+			m_occ_n_hole_Mask_B = new int[width * height];
+		memset(m_occ_n_hole_Mask_F, 0, width*height*sizeof(int));
+		memset(m_occ_n_hole_Mask_B, 0, width*height*sizeof(int));
 		memset(m_FMVX, 0, width*height*sizeof(int));
 		memset(m_FMVX, 0, width*height*sizeof(int));
 		memset(m_BMVX, 0, width*height*sizeof(int));
@@ -134,7 +142,9 @@ public:
 		this->reshapeMVMap(frameWidth, frameHeight, frame_interval, forward_mvX, forward_mvY, backward_mvX, backward_mvY);
 		this->occ_n_hole_Mask(frameWidth, frameHeight, frame_interval, nBlkWidth, nBlkHeight, overlapsize);
 		int idx = 0;
-		int* pixel = new int[frameWidth*frameHeight];
+		unsigned int* pixel = new unsigned int[frameWidth*frameHeight];
+		memset(pixel, 0, frameWidth*frameHeight*sizeof(int));
+
 		for (int y = 0; y < frameHeight; y++) {
 			for (int x = 0; x < frameWidth; x++) {
 				int bmx = x+m_BMVX[idx + x];
@@ -143,7 +153,7 @@ public:
 				int fmy = y+m_FMVY[idx + x];
 				if (!((bmx < 0 || bmx >= frameWidth) || (fmy < 0 || fmy >= frameHeight))) {
 					int b_idx = bmx + (fmy)*frameWidth;
-					if (m_occ_n_hole_Mask[idx+x] != 0)
+					if (m_occ_n_hole_Mask_B[idx+x] != 0)
 						pixel[idx + x] += prevFrame[b_idx];
 					else {	//	hole
 					}
@@ -152,7 +162,7 @@ public:
 
 				if (!((fmx < 0 || fmx >= frameWidth) || (fmy < 0 || fmy >= frameHeight))) {
 					int f_idx = fmx + (fmy)*frameWidth;
-					if (m_occ_n_hole_Mask[idx + x] != 0) {
+					if (m_occ_n_hole_Mask_F[idx + x] != 0) {
 						pixel[idx + x] += nextFrame[f_idx];
 					}
 					else {	//	hole
@@ -167,9 +177,16 @@ public:
 		if (doesHoleProc == true)
 			this->hole_processing();
 		idx = 0;
-		for (int y = 0; y < frameHeight; y++) {
+		for (int y = 0; y < frameHeight; y++) {	//
 			for (int x = 0; x < frameWidth; x++) {
-				OUT_interpolFrame[idx + x] = pixel[idx + x] / m_occ_n_hole_Mask[idx + x];
+				int div = m_occ_n_hole_Mask_B[idx + x] + m_occ_n_hole_Mask_F[idx + x];
+				if (m_occ_n_hole_Mask_B[idx + x] != 0 || m_occ_n_hole_Mask_F[idx + x] != 0) {
+					OUT_interpolFrame[idx + x] = (pixel[idx + x] / div) > 255 ?
+						255 : (pixel[idx + x] / div);
+				}
+				else {
+					//TODO: Hole Proc
+				}
 			}
 			idx += frameWidth;
 		}

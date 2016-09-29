@@ -7,8 +7,8 @@
 #include "TrainDataGenerator.h"
 int _tmain(int argc, _TCHAR* argv[])
 {
-	test_frame_interpolation(286, "d:/mvmap_db/1", "d:/phd/fruc/1", "png", 16, 16, 32, 2, 3);
-
+	test_frame_interpolation_fbClassify(286, "d:/mvmap_db/1", "d:/phd/fruc/1", "png", 16, 16, 32, 2, 0);
+	//test_frame_interpolation(286, "d:/mvmap_db/1", "d:/phd/fruc/1", "png", 16, 16, 32, 2, 0);
 
 
 }

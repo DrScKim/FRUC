@@ -154,7 +154,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FBClassify\FBClassfyDefine.h" />
+    <ClInclude Include="FBClassify\FBClassifier.h" />
     <ClInclude Include="FrameInterpolation.h" />
+    <ClInclude Include="FrameInterpol_fbClassify.h" />
     <ClInclude Include="FRUC_tester.h" />
     <ClInclude Include="MatUtil.h" />
     <ClInclude Include="FrameInfo.h" />
@@ -165,6 +168,7 @@
     <ClInclude Include="MotionEstiamte.h" />
     <ClInclude Include="motionvector.h" />
     <ClInclude Include="MVDiff.h" />
+    <ClInclude Include="ShotChange\LuminanceHisto.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="timeUtil.h" />

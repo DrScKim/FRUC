@@ -69,31 +69,35 @@ public:
 	
 	void simple_classify(BYTE* diffPrev, BYTE* diffCur, BYTE* diffPost, int width, int height, int threshold1, int threshold2)
 	{
-		int idx;
+		int idx = 0;
+		int i = 0, j = 0;
 		for (int h = 0; h < height; h++) {
 			for (int w = 0; w < width; w++) {
 				int coord = idx + w;
 				if (diffCur[w + h*width] < threshold1) {
 					m_table[w + h*width] = SG_BACKGROUND;
+					i++;
 				}
 				else {
 					if(diffPrev[w + h*width] > threshold2 && diffPost[w + h*width] < threshold2) {// + + - 
 						m_table[w + h*width] = SG_BACKGROUND_FROM_FORWARD;
 					}
 					if (diffPrev[w + h*width] < threshold2 && diffPost[w + h*width] < threshold2) {// - + -	in or out 
-						m_table[w + h*width] = SG_FOR_BLENDING;
+						m_table[w + h*width] = SG_FOR_AVERAGING;
 					}
 					if (diffPrev[w + h*width] < threshold2 && diffPost[w + h*width] > threshold2) {// - + +
 						m_table[w + h*width] = SG_BACKGROUND_FROM_BACKWARD;
 					}
 					if (diffPrev[w + h*width] > threshold2 && diffPost[w + h*width] > threshold2) {
-						m_table[w + h*width] = SG_FOR_AVERAGING;
+						m_table[w + h*width] = SG_FOR_BLENDING;
 					}
+					j++;
 				}
 
 			}
 			idx += height;
 		}
+		cout << "background case : " << i << ", " << "others : " << j << " total pixels : " << width*height << endl;
 	}
 
 	void classify(BYTE* diffPrev, BYTE* diffCur, BYTE* diffPost, int width, int height, int threshold1, int threshold2) {
