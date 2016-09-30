@@ -80,15 +80,15 @@ public:
 				}
 				else {
 					if(diffPrev[w + h*width] > threshold2 && diffPost[w + h*width] < threshold2) {// + + - 
-						m_table[w + h*width] = SG_BACKGROUND_FROM_FORWARD;
+						m_table[w + h*width] = SG_BACKGROUND_FROM_BACKWARD;
 					}
 					if (diffPrev[w + h*width] < threshold2 && diffPost[w + h*width] < threshold2) {// - + -	in or out 
 						m_table[w + h*width] = SG_FOR_AVERAGING;
 					}
 					if (diffPrev[w + h*width] < threshold2 && diffPost[w + h*width] > threshold2) {// - + +
-						m_table[w + h*width] = SG_BACKGROUND_FROM_BACKWARD;
+						m_table[w + h*width] = SG_BACKGROUND_FROM_FORWARD;
 					}
-					if (diffPrev[w + h*width] > threshold2 && diffPost[w + h*width] > threshold2) {
+					if (diffPrev[w + h*width] > threshold2 && diffPost[w + h*width] > threshold2) {// + + + action!
 						m_table[w + h*width] = SG_FOR_BLENDING;
 					}
 					j++;

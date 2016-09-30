@@ -84,6 +84,7 @@ public:
 			Mat interpol = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
 			int nCols = curFrame.cols / frameInfo.getBlkWidth(), nRows = curFrame.rows / frameInfo.getBlkHeight();
 			frameInfo.motion_estimate(curFrame, nextFrame);
+			/*
 			Mat mvfx = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, true, true, 0.5);
 			Mat mvfy = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, true, false, 0.5);
 			Mat mvbx = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, false, true, 0.5);
@@ -92,6 +93,7 @@ public:
 				mvfx.data, mvfy.data, mvbx.data, mvby.data, curFrame.cols, curFrame.rows,
 				frameInfo.getBlkWidth(), frameInfo.getBlkHeight(), m_frame_interval, m_overlap_size, fbClassifier, false);
 			imwrite(interpol_path, interpol);
+			*/
 			//assign frames for next sequnce
 			m_file_idx += m_frame_interval;
 			path_setup(m_file_idx);
@@ -112,7 +114,7 @@ public:
 			//classify from forward or backward
 			fbClassifier.setTable(curFrame.cols, curFrame.rows);
 			fbClassifier.classify((const BYTE*)prevYFrame.data, (const BYTE*)frameInfo.getCurYFrameData(), (const BYTE*)frameInfo.getNextYFrameData(), (const BYTE*)postYFrame.data, 
-				curFrame.cols, curFrame.rows, 5, 3);
+				curFrame.cols, curFrame.rows, 3, 5);
 			//motion estimate
 			frameInfo.motion_estimate(curFrame, nextFrame);
 			//motion vector correction
@@ -120,11 +122,18 @@ public:
 			Mat mvfy = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, true, false, 0.5);
 			Mat mvbx = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, false, true, 0.5);
 			Mat mvby = frameInfo.get_motion_vector_map_interpol(nCols, nRows, curFrame.cols, false, false, 0.5);
+			
 			//frame interpolation
 			interpolator.basic_interpolation(interpol.data, frameInfo.getCurYFrameData(), frameInfo.getNextYFrameData(),
 				mvfx.data, mvfy.data, mvbx.data, mvby.data, curFrame.cols, curFrame.rows,
 				frameInfo.getBlkWidth(), frameInfo.getBlkHeight(), m_frame_interval, m_overlap_size, fbClassifier, true);
+			
 			imwrite(interpol_path, interpol);
+
+			Mat res = Mat(Size(curFrame.cols/4, curFrame.rows/4), CV_8UC1, Scalar(0));
+			resize(interpol, res, Size(interpol.cols / 4, interpol.rows / 4));
+			resize(res, interpol, Size(interpol.cols * 4, interpol.rows * 4));
+			
 			//assign frames for next sequnce
 			m_file_idx += m_frame_interval;
 			path_setup(m_file_idx);

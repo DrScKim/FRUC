@@ -14,6 +14,7 @@ protected:
 	int* m_BMVY;
 	int* m_occ_n_hole_Mask_F;
 	int* m_occ_n_hole_Mask_B;
+	int* m_hole_table;
 
 	void occ_n_hole_Mask(int width, int height, int frameinterval, int blkW, int blkH, int overlapsize = 0) {
 		memset(m_occ_n_hole_Mask_F, 0, width*height*sizeof(int));
@@ -95,7 +96,7 @@ protected:
 public:
 	FrameInterpolation(){}
 	FrameInterpolation(int width, int height): m_FMVX(NULL), m_FMVY(NULL), m_BMVX(NULL), m_BMVY(NULL),
-		m_occ_n_hole_Mask_F(NULL), m_occ_n_hole_Mask_B(NULL){
+		m_occ_n_hole_Mask_F(NULL), m_occ_n_hole_Mask_B(NULL), m_hole_table(NULL){
 		init(width, height);
 	}
 	~FrameInterpolation() {
@@ -105,6 +106,7 @@ public:
 		if (m_BMVY) delete[] m_BMVY;
 		if (m_occ_n_hole_Mask_F) delete[] m_occ_n_hole_Mask_F;
 		if (m_occ_n_hole_Mask_B) delete[] m_occ_n_hole_Mask_B;
+		if (m_hole_table) delete[] m_hole_table;
 	}
 	void init(int width, int height) {
 		if (!m_FMVX)
@@ -119,12 +121,15 @@ public:
 			m_occ_n_hole_Mask_F = new int[width * height];
 		if (!m_occ_n_hole_Mask_B)
 			m_occ_n_hole_Mask_B = new int[width * height];
+		if (!m_hole_table)
+			m_hole_table = new int[width * height];
 		memset(m_occ_n_hole_Mask_F, 0, width*height*sizeof(int));
 		memset(m_occ_n_hole_Mask_B, 0, width*height*sizeof(int));
 		memset(m_FMVX, 0, width*height*sizeof(int));
 		memset(m_FMVX, 0, width*height*sizeof(int));
 		memset(m_BMVX, 0, width*height*sizeof(int));
 		memset(m_BMVY, 0, width*height*sizeof(int));
+		memset(m_hole_table, 0, width*height*sizeof(int));
 	}
 
 	void overlap_set_pel(int out_idx, int ref_idx, uchar* ref_frame, int overlapsize) {
@@ -158,8 +163,6 @@ public:
 					else {	//	hole
 					}
 				}
-					
-
 				if (!((fmx < 0 || fmx >= frameWidth) || (fmy < 0 || fmy >= frameHeight))) {
 					int f_idx = fmx + (fmy)*frameWidth;
 					if (m_occ_n_hole_Mask_F[idx + x] != 0) {
@@ -168,9 +171,6 @@ public:
 					else {	//	hole
 					}
 				}
-					
-
-				
 			}
 			idx += frameWidth;
 		}

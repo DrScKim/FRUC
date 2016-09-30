@@ -25,6 +25,7 @@ public:
 	inline int H() const { return h; }
 	inline VECTOR GetMV() const { return vector; }
 	inline int GetSAD() const { return vector.sad; }
+	inline void updateMV(int _dx, int _dy) { this->vector.x = _dx; this->vector.y = _dy; }
 	inline void updateMV(int _dx, int _dy, int _sad) { this->vector.x = _dx; this->vector.y = _dy; this->vector.sad = _sad; }
 };
 

@@ -34,6 +34,9 @@
     <Filter Include="FBClassify">
       <UniqueIdentifier>{16a9ec97-d19c-469d-b06f-6c9e962ea423}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HoleProcess">
+      <UniqueIdentifier>{343cb9a4-3006-4e3b-bd41-92b5410b53d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -102,6 +105,12 @@
     <ClInclude Include="FrameInterpol_fbClassify.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HoleProcess\BDHI.h">
+      <Filter>HoleProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="PMVS.h">
+      <Filter>Estimate</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -112,6 +121,9 @@
     </ClCompile>
     <ClCompile Include="FRUC.h">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HoleProcess\BDHI.cpp">
+      <Filter>HoleProcess</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -159,6 +159,7 @@
     <ClInclude Include="FrameInterpolation.h" />
     <ClInclude Include="FrameInterpol_fbClassify.h" />
     <ClInclude Include="FRUC_tester.h" />
+    <ClInclude Include="HoleProcess\BDHI.h" />
     <ClInclude Include="MatUtil.h" />
     <ClInclude Include="FrameInfo.h" />
     <ClInclude Include="Interpolation.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="MotionEstiamte.h" />
     <ClInclude Include="motionvector.h" />
     <ClInclude Include="MVDiff.h" />
+    <ClInclude Include="PMVS.h" />
     <ClInclude Include="ShotChange\LuminanceHisto.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -179,6 +181,7 @@
   <ItemGroup>
     <ClCompile Include="FrameRateUpConversion.cpp" />
     <ClCompile Include="FRUC.h" />
+    <ClCompile Include="HoleProcess\BDHI.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
