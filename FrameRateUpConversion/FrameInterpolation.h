@@ -12,6 +12,10 @@ protected:
 	int* m_FMVY;
 	int* m_BMVX;
 	int* m_BMVY;
+	uchar* m_Fdpmap;
+	uchar* m_Bdpmap;
+	uchar* m_Fsadmap;
+	uchar* m_Bsadmap;
 	int* m_occ_n_hole_Mask_F;
 	int* m_occ_n_hole_Mask_B;
 	int* m_hole_table;
@@ -93,6 +97,22 @@ protected:
 			idx += width;
 		}
 	}
+	void filldiffpixelMap(uchar* prevFrame, uchar* nextFrame, int width, int height ) {
+		int *fmvx = m_FMVX, *fmvy = m_FMVY, *bmvx = m_BMVX, *bmvy = m_BMVY;
+		uchar *prev = prevFrame, *next = nextFrame;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				int idx = x + y * width;
+				int fidx = *fmvx+x + (y+ *fmvy)*width;
+				int bidx = *bmvx+x + (y+ *bmvy)*width;
+
+				m_Fdpmap[idx] = std::abs(prevFrame[idx] - nextFrame[fidx]);
+				m_Bdpmap[idx] = std::abs(prevFrame[bidx] - nextFrame[idx]);
+
+				fmvx++;	fmvy++;	bmvx++;	bmvy++;
+			}
+		}
+	}
 public:
 	FrameInterpolation(){}
 	FrameInterpolation(int width, int height): m_FMVX(NULL), m_FMVY(NULL), m_BMVX(NULL), m_BMVY(NULL),
@@ -104,19 +124,24 @@ public:
 		if (m_FMVY) delete[] m_FMVY;
 		if (m_BMVX) delete[] m_BMVX;
 		if (m_BMVY) delete[] m_BMVY;
+		if (m_Fsadmap) delete[] m_Fsadmap;
+		if (m_Bsadmap) delete[] m_Bsadmap;
+		if (m_Fdpmap) delete[] m_Fdpmap;
+		if (m_Bdpmap) delete[] m_Bdpmap;
+
 		if (m_occ_n_hole_Mask_F) delete[] m_occ_n_hole_Mask_F;
 		if (m_occ_n_hole_Mask_B) delete[] m_occ_n_hole_Mask_B;
 		if (m_hole_table) delete[] m_hole_table;
 	}
 	void init(int width, int height) {
-		if (!m_FMVX)
-			m_FMVX = new int[width * height];
-		if (!m_FMVY)
-			m_FMVY = new int[width * height];
-		if (!m_BMVX)
-			m_BMVX = new int[width * height];
-		if (!m_BMVY)
-			m_BMVY = new int[width * height];
+		if (!m_FMVX) m_FMVX = new int[width * height];
+		if (!m_FMVY) m_FMVY = new int[width * height];
+		if (!m_BMVX) m_BMVX = new int[width * height];
+		if (!m_BMVY) m_BMVY = new int[width * height];
+		if (m_Fsadmap) m_Fsadmap = new uchar[width * height];
+		if (m_Bsadmap) m_Bsadmap = new uchar[width * height];
+		if (m_Fdpmap) m_Fdpmap = new uchar[width * height];
+		if (m_Bdpmap) m_Bdpmap = new uchar[width * height];
 		if (!m_occ_n_hole_Mask_F)
 			m_occ_n_hole_Mask_F = new int[width * height];
 		if (!m_occ_n_hole_Mask_B)
@@ -145,6 +170,10 @@ public:
 			do not porcess hole regions
 		*/
 		this->reshapeMVMap(frameWidth, frameHeight, frame_interval, forward_mvX, forward_mvY, backward_mvX, backward_mvY);
+		
+		
+		//this->filldiffpixelMap();
+		
 		this->occ_n_hole_Mask(frameWidth, frameHeight, frame_interval, nBlkWidth, nBlkHeight, overlapsize);
 		int idx = 0;
 		unsigned int* pixel = new unsigned int[frameWidth*frameHeight];

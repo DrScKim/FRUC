@@ -7,11 +7,21 @@
 #include "TrainDataGenerator.h"
 int _tmain(int argc, _TCHAR* argv[])
 {
-	test_frame_interpolation_fbClassify(286, "d:/mvmap_db/1", "d:/phd/fruc/1", "png", 16, 16, 32, 2, 0);
+	//test_frame_interpolation_fbClassify(286, "d:/mvmap_db/1", "d:/phd/fruc/1", "png", 16, 16, 32, 2, 0);
+	
 	//test_frame_interpolation(286, "d:/mvmap_db/1", "d:/phd/fruc/1", "png", 16, 16, 32, 2, 0);
-	//makeGroundTruth(286, "d:/mvmap_db/1", "d:/phd/fruc/1/gt", "png");
-	checkPSNR(287, "d:/phd/fruc/1/gt", "d:/phd/fruc/1", "png");
+	//test_frame_interpolation_fbClassify(2202, "d:/mvmap_db/2", "d:/phd/fruc/2", "png", 16, 16, 32, 2, 0);
+	//makeGroundTruth(2202, "d:/mvmap_db/2", "d:/phd/fruc/2/gt", "png");
+	//test_frame_interpolation_fbClassify(2436, "d:/mvmap_db/3", "d:/phd/fruc/3", "png", 16, 16, 32, 2, 0);
+	//makeGroundTruth(2436, "d:/mvmap_db/3", "d:/phd/fruc/3/gt", "png");
+	//test_frame_interpolation_fbClassify(4046, "d:/mvmap_db/4", "d:/phd/fruc/4", "png", 16, 16, 32, 2, 0);
+	//makeGroundTruth(4046, "d:/mvmap_db/4", "d:/phd/fruc/4/gt", "png");
+	//test_frame_interpolation_fbClassify(11610, "d:/mvmap_db/5", "d:/phd/fruc/5", "png", 16, 16, 32, 2, 0);
+	//makeGroundTruth(11610, "d:/mvmap_db/5", "d:/phd/fruc/5/gt", "png");
 
+	//checkPSNR(287, "d:/phd/fruc/1/gt", "d:/phd/fruc/1", "png");
+	test_frucnn_fb("d:/phd/fruc/1/gt/336.png", "d:/phd/fruc/1/gt/338.png", "d:/phd/fruc/1/gt/340.png", "d:/phd/fruc/1/gt/342.png", "d:/phd/fruc/1/BLUR.png", "d:/phd/fruc/1/gt/339.png", "d:/phd/fruc/1/result.png");
+	//blur("d:/phd/fruc/1/result.png", "d:/phd/fruc/1/BLUR.png", "d:/phd/fruc/1/gt/315.png");
 }
 
 											

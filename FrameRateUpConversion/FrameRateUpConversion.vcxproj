@@ -154,9 +154,11 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DiffPixelMap.h" />
     <ClInclude Include="FBClassify\FBClassfyDefine.h" />
     <ClInclude Include="FBClassify\FBClassifier.h" />
     <ClInclude Include="FrameInterpolation.h" />
+    <ClInclude Include="FrameInterpolation_FB_DP.h" />
     <ClInclude Include="FrameInterpol_fbClassify.h" />
     <ClInclude Include="FRUC_tester.h" />
     <ClInclude Include="HoleProcess\BDHI.h" />

@@ -127,13 +127,8 @@ public:
 			interpolator.basic_interpolation(interpol.data, frameInfo.getCurYFrameData(), frameInfo.getNextYFrameData(),
 				mvfx.data, mvfy.data, mvbx.data, mvby.data, curFrame.cols, curFrame.rows,
 				frameInfo.getBlkWidth(), frameInfo.getBlkHeight(), m_frame_interval, m_overlap_size, fbClassifier, true);
-			
+			//GaussianBlur(interpol, interpol, Size(5, 5), 1.5 , 1.5);
 			imwrite(interpol_path, interpol);
-
-			Mat res = Mat(Size(curFrame.cols/4, curFrame.rows/4), CV_8UC1, Scalar(0));
-			resize(interpol, res, Size(interpol.cols / 4, interpol.rows / 4));
-			resize(res, interpol, Size(interpol.cols * 4, interpol.rows * 4));
-			
 			//assign frames for next sequnce
 			m_file_idx += m_frame_interval;
 			path_setup(m_file_idx);

@@ -17,6 +17,9 @@
 typedef unsigned char uint8_t;
 class MotionEstimator {
 	std::vector<MacroBlockData> m_mbs;
+	
+
+
 	int m_nBlkX;
 	int m_nBlkY;
 
@@ -34,7 +37,7 @@ class MotionEstimator {
 public:
 	MotionEstimator() {}
 	~MotionEstimator() {}
-
+	
 	inline int initBlock(int blkX, int blkY) {
 		if (blkX == 0 || blkY == 0)
 			return ERROR_NOT_AVAILABLE_MACROBLOCK_SIZE;
@@ -49,6 +52,7 @@ public:
 	inline MacroBlockData getBlock(int col, int row) { return m_mbs[col + row*m_nBlkX]; }
 	inline void reset() {
 		m_mbs.clear();
+		
 	}
 	inline void smoothing(int nBlkX, int nBlkY) {
 

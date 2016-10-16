@@ -7,9 +7,7 @@
 
 class FrameInterpolation_FBClassify : public FrameInterpolation
 {
-
-
-
+protected:
 	void fillbackground(uchar* OUT_interpolFrame, uchar* prevFrame, uchar* nextFrame, FBClassifier& fbClassifier, int frameWidth, int frameHeight) {
 		int* fb_table = fbClassifier.getTable();
 		int idx = 0;
@@ -19,13 +17,12 @@ class FrameInterpolation_FBClassify : public FrameInterpolation
 				int cl = fb_table[idx + x];
 				switch (cl) {
 				case SG_BACKGROUND:
-					OUT_interpolFrame[idx + x] = prevFrame[idx + x];//(prevFrame[idx + x] >> 1) + (nextFrame[idx + x] >> 1);
+					OUT_interpolFrame[idx + x] = prevFrame[idx + x];//(prevFrame[idx + x] /2) + (nextFrame[idx + x] /2);
 					m_occ_n_hole_Mask_F[idx + x] = 0;
 					m_occ_n_hole_Mask_B[idx + x] = 0;
 					m_hole_table[idx + x] = 2;
 					i++;
 					break;
-				
 					/*
 					case SG_BACKGROUND_FROM_BACKWARD:
 					OUT_interpolFrame[idx + x] = prevFrame[idx + x];
@@ -50,9 +47,6 @@ class FrameInterpolation_FBClassify : public FrameInterpolation
 			}
 			idx += frameWidth;
 		}
-		cout << "background : " << i << " Averaging : "<< j << endl;
-		cout << "from backward : " << k << " from forward : " << l << endl;
-		cout << "unprocessed : " << frameWidth*frameHeight - (i + j + k + l) << endl;
 	}
 public:
 	FrameInterpolation_FBClassify() {
@@ -75,8 +69,6 @@ public:
 		this->reshapeMVMap(frameWidth, frameHeight, 1, forward_mvX, forward_mvY, backward_mvX, backward_mvY);
 		this->occ_n_hole_Mask(frameWidth, frameHeight, frame_interval, nBlkWidth, nBlkHeight, overlapsize);
 		
-		if (doesFBClassifierUse == true)
-			this->fillbackground(OUT_interpolFrame, prevFrame, nextFrame, fbClassifier, frameWidth, frameHeight);
 			
 		int idx = 0;
 		int* hole_table = new int[frameWidth* frameHeight];
@@ -129,6 +121,8 @@ public:
 			}
 			idx += frameWidth;
 		}
+		if (doesFBClassifierUse == true)
+			this->fillbackground(OUT_interpolFrame, prevFrame, nextFrame, fbClassifier, frameWidth, frameHeight);
 
 		//if (doesHoleProc == true)
 		this->hole_processing(m_hole_table, OUT_interpolFrame, frameWidth, frameHeight, frameWidth / 40, frameHeight / 40);

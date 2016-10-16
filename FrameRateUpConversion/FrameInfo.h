@@ -12,6 +12,7 @@ class FrameInfo {
 	MotionEstimator m_forward_mv;
 	MotionEstimator m_backward_mv;
 	int m_blkW, m_blkH, m_searchRange;
+	int* m_SADmapF, *m_SADmapB;
 	Mat curYframe;
 	Mat nextYframe;
 	void setPixel(Mat& output, int x, int y, int value, int blkW, int blkH, int frameW) {
@@ -23,9 +24,18 @@ class FrameInfo {
 			idx += frameW;
 		}
 	}
+	void setPixel(int* output, int x, int y, int value, int blkW, int blkH, int frameW) {
+		int idx = x + y * frameW;
+		for (int j = 0; j < blkH; j++) {
+			for (int i = 0; i < blkW; i++) {
+				output[idx + i] = value;
+			}
+			idx += frameW;
+		}
+	}
 
 public:
-	FrameInfo() {}
+	FrameInfo() : m_SADmapF(NULL), m_SADmapB(NULL){}
 	~FrameInfo() {}
 	int getBlkWidth() { return m_blkW; }
 	int getBlkHeight() { return m_blkH; }
@@ -35,7 +45,6 @@ public:
 		m_blkH = blkH;
 		m_searchRange = searchRange < 0 ? 1 : searchRange;
 		m_searchRange = searchRange >= 128 ? 128 : searchRange;
-
 	}
 	uchar* getCurYFrameData() { return curYframe.data; }
 	uchar* getNextYFrameData() { return nextYframe.data; }
@@ -64,7 +73,51 @@ public:
 		std::cout << "Elapsed: " << float(clock() - begin_time) / CLOCKS_PER_SEC << std::endl;;
 	}
 
-	
+	Mat get_sad_map() {
+
+	}
+
+	Mat get_sad_map(int nCols, int nRows, int frameW, bool isForward, float mv_scale = 1.0) {
+		Mat output = Mat(Size(nCols*m_blkW, nRows*m_blkH), CV_8UC1, Scalar(0));
+		for (int i = 0; i < nCols; i++) {
+			for (int j = 0; j < nRows; j++) {
+				vector<MacroBlockData>* mbs;
+				if (isForward == true) mbs = m_forward_mv.getMacroBlockList(); else mbs = m_backward_mv.getMacroBlockList();
+				for (vector<MacroBlockData>::iterator iter = mbs->begin(); iter != mbs->end(); iter++) {
+					int x = iter->X();
+					int y = iter->Y();
+					setPixel(output, x, y, iter->GetSAD(), m_blkW, m_blkH, frameW);
+
+				}
+			}
+		}
+		return output;
+	}
+	Mat get_motion_vector_map(int nCols, int nRows, int frameW, bool isForward, bool isHorizontal, float mv_scale = 1.0) {
+
+		Mat output = Mat(Size(nCols*m_blkW, nRows*m_blkH), CV_8UC1, Scalar(0));
+		
+		for (int i = 0; i < nCols; i++) {
+			for (int j = 0; j < nRows; j++) {
+				vector<MacroBlockData>* mbs;
+				if (isForward == true) mbs = m_forward_mv.getMacroBlockList(); else mbs = m_backward_mv.getMacroBlockList();
+				for (vector<MacroBlockData>::iterator iter = mbs->begin(); iter != mbs->end(); iter++) {
+					int x = iter->X();
+					int y = iter->Y();
+					int value = 0;
+					if (isHorizontal)
+						value = iter->GetMV().x * mv_scale + 128;
+					else
+						value = iter->GetMV().y * mv_scale + 128;
+					setPixel(output, x, y, value, m_blkW, m_blkH, frameW);
+					
+				}
+			}
+		}
+		
+		return output;
+	}
+
 	Mat get_motion_vector_map_interpol(int nCols, int nRows, int frameW, bool isForward, bool isHorizontal, float mv_scale = 1.0) {
 		Mat output = Mat(Size(nCols, nRows), CV_8UC1, Scalar(0));
 		for (int i = 0; i < nCols; i++) {

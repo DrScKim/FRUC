@@ -111,6 +111,12 @@
     <ClInclude Include="PMVS.h">
       <Filter>Estimate</Filter>
     </ClInclude>
+    <ClInclude Include="DiffPixelMap.h">
+      <Filter>Estimate</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameInterpolation_FB_DP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

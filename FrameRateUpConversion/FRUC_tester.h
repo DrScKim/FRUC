@@ -13,6 +13,57 @@ inline void test_frame_interpolation(int idx, char* load_dir, char* save_dir, ch
 
 }
 
+inline void blur(char* result, char* blur, char* gt) {
+	Mat resultMat = imread(result);
+	Mat gtMat = imread(gt);
+	Mat resultBlur;
+	//GaussianBlur(resultMat, resultBlur, Size(5, 5), 0);
+	
+	medianBlur(resultMat, resultBlur, 5);
+	imwrite(blur, resultBlur);
+	
+	double psnr = getPSNRFrame(gtMat, resultBlur);
+	cout << "Blur PSNR : " << psnr << endl;
+	
+}
+inline void test_frucnn_fb(char* prev, char* cur, char* next, char* post, char* frucnn, char* gt, char* result) {
+	Mat curYFrame = imread(cur);
+	Mat nextYFrame = imread(next);
+	Mat prevYFrame = imread(prev);
+	Mat postYFrame = imread(post);
+	Mat frucnnYFrame = imread(frucnn);
+	Mat gtYFrame = imread(gt);
+	Mat resultYFrame = imread(result);
+	FBClassifier fbClassifier;
+	double psnr0 = getPSNRFrame(gtYFrame, resultYFrame);
+	double psnr1 = getPSNRFrame(gtYFrame, frucnnYFrame);
+	fbClassifier.setTable(curYFrame.cols, curYFrame.rows);
+	fbClassifier.classify((const BYTE*)prevYFrame.data, (const BYTE*)curYFrame.data, (const BYTE*)nextYFrame.data, (const BYTE*)postYFrame.data,
+		curYFrame.cols, curYFrame.rows, 50, 50);
+	int *table = fbClassifier.getTable();
+	for (int y = 0; y < prevYFrame.rows; y++) {
+		for (int x = 0; x < curYFrame.cols; x++) {
+			
+			if (table[x + y*curYFrame.cols] == SG_BACKGROUND) {
+				frucnnYFrame.data[x + y * curYFrame.cols] = (curYFrame.data[x + y * curYFrame.cols] >> 1) + (nextYFrame.data[x + y*curYFrame.cols] >> 1);
+			}
+			
+			else if (table[x + y*curYFrame.cols] == SG_BACKGROUND_FROM_BACKWARD) {
+				frucnnYFrame.data[x + y * curYFrame.cols] = postYFrame.data[x + y * prevYFrame.cols];
+			}
+			else if (table[x + y*curYFrame.cols] == SG_BACKGROUND_FROM_FORWARD) {
+				frucnnYFrame.data[x + y * curYFrame.cols] = prevYFrame.data[x + y * postYFrame.cols];
+			}
+			
+		}
+	}
+	double psnr2 = getPSNRFrame(gtYFrame, frucnnYFrame);
+	cout << "PSNR of Path based Interpolation: " << psnr0 << endl;
+	cout << "PSNR of FRUCNN: " << psnr1 << endl;
+	cout << "PSNR of FRUCNN + FBClassifier: " << psnr2 << endl;
+	imwrite("D:/phd/fruc/1/frucnn_fb.png", frucnnYFrame);
+
+}
 inline void test_frame_interpolation_fbClassify(int idx, char* load_dir, char* save_dir, char* file_ext,
 	int blkSizeW, int blkSizeH, int searchRange, int frame_interval, int overlap_size)
 {
