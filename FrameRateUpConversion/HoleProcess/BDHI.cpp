@@ -6,7 +6,9 @@ Motion-Compensated Frame Rate Up-Conversion—Part II: New Algorithms for Frame 
 
 */
 #include <iostream>
-#define PADDING(a) a = a > 256 ? 255 : a < 0 ? 0 : a
+#include <math.h>
+#include <algorithm>
+#define CLIPPING(a) a= ((a = a > 256 ? 255 : a) < 0 ? 0 : a)
 
 #define PEL_OCCLUSION	4
 #define PEL_FILLED	1
@@ -20,20 +22,24 @@ Motion-Compensated Frame Rate Up-Conversion—Part II: New Algorithms for Frame 
 #define NOT_OCCLUSION	0
 
 typedef unsigned char BYTE;
-
+typedef unsigned char uchar;
 #define SGMIN(x,y)	(x>y ? y:x)
 #define SGMAX(x,y)	(x<y ? y:x)
 #define SGABS(x)	(x<0 ? -x:x)
+
+using namespace std;
 
 float getAlpha(float A, float a, float b, float c) {
 	return 1.f - ((b*c + a*c + a*b) / (a*b*c));
 }
 
-void BDHI(int* LUT, BYTE* pdst, int dstPitch, int width, int height, int W_threshold, int H_threshold)
+void BDHI(int* LUT, uchar* pdst, int dstPitch, int width, int height, int W_threshold, int H_threshold)
 {
+	int l = 0;
 	for (int h = 0; h<height; h++) {
 		for (int w = 0; w<width; w++) {
-			if (LUT[w + h*width] == PEL_HOLE) {
+			if (LUT[w + h*width] == PEL_UNFILLED) {
+				l++;
 				int pdh, pdv, pdd, pdr; pdh = pdv = pdd = pdr = 0;
 				float Dh, Dv, Dd, Dr; Dh = Dv = Dd = Dr = 1;
 				float Ph = getPh(LUT, pdst, w, h, width, height, dstPitch, Dh, pdh);
@@ -42,7 +48,8 @@ void BDHI(int* LUT, BYTE* pdst, int dstPitch, int width, int height, int W_thres
 				float Pr = getPr(LUT, pdst, w, h, width, height, dstPitch, Dr, pdr);
 				float Pix;
 				int totalPixelDiff = 0;
-
+				int a = pdst[w];
+				
 				/*
 				if (Dh > H_threshold) {	//for blending
 				w += Dh; continue;
@@ -52,22 +59,23 @@ void BDHI(int* LUT, BYTE* pdst, int dstPitch, int width, int height, int W_thres
 				}
 				*/
 
-				if (SGMIN(SGMIN(SGMIN(Dh, Dv), Dd), Dr) == Dh) { totalPixelDiff = pdh; Pix = Ph; }
-				else if (SGMIN(SGMIN(SGMIN(Dh, Dv), Dd), Dr) == Dv) { totalPixelDiff = pdv; Pix = Pv; }
-				else if (SGMIN(SGMIN(SGMIN(Dh, Dv), Dd), Dr) == Dr) { totalPixelDiff = pdr; Pix = Pr; }
-				else if (SGMIN(SGMIN(SGMIN(Dh, Dv), Dd), Dr) == Dd) { totalPixelDiff = pdd; Pix = Pd; }
+				if (std::min(std::min(std::min(Dh, Dv), Dd), Dr) == Dh) { totalPixelDiff = pdh; Pix = Ph; }
+				else if (std::min(std::min(std::min(Dh, Dv), Dd), Dr) == Dv) { totalPixelDiff = pdv; Pix = Pv; }
+				else if (std::min(std::min(std::min(Dh, Dv), Dd), Dr) == Dr) { totalPixelDiff = pdr; Pix = Pr; }
+				else if (std::min(std::min(std::min(Dh, Dv), Dd), Dr) == Dd) { totalPixelDiff = pdd; Pix = Pd; }
 
-
+				
 
 				Ph = (Ph*(Dv + Dd + Dr) + Pv*(Dh + Dd + Dr) + Pd*(Dh + Dv + Dr) + Pr*(Dh + Dv + Dd)) / (3 * (Dh + Dv + Dd + Dr));
-				PADDING(Ph);
-				pdst[w] = (BYTE)(Ph);
+				
+				pdst[w] = (BYTE)round(Ph);
 				LUT[w + h*width] = PEL_FILLED_BY_BDHI;
 			}
 		}
 		pdst += dstPitch;
 
 	}
+	//std::cout << "BDHI : " << l << std::endl;
 }
 //Ph, Pv, Pd, Pr, in page 146
 float getPh(int* LUT, BYTE* pixels, int x, int y, int width, int height, int pixelPitch, float& Dh, int& AbsDiff) {
@@ -75,14 +83,14 @@ float getPh(int* LUT, BYTE* pixels, int x, int y, int width, int height, int pix
 	int p1 = 1, p2 = 1;
 	BYTE* pixelTemp = pixels;
 
-	while (LUT[(x1)+y*width] == PEL_HOLE) {
+	while (LUT[(x1)+y*width] == PEL_UNFILLED) {
 		d1++; x1--;
 		if (x1 < 0) {
 			p1 = 0;
 			break;
 		}
 	}
-	while (LUT[(x2)+y*width] == PEL_HOLE) {
+	while (LUT[(x2)+y*width] == PEL_UNFILLED) {
 		d2++; x2++;
 		if (x2 >= width) {
 			p2 = 0;
@@ -103,7 +111,7 @@ float getPv(int* LUT, BYTE* pixels, int x, int y, int width, int height, int pix
 	int y1, y2; y1 = y; y2 = y; int d1 = 0, d2 = 0;
 	BYTE p1 = 1, p2 = 1;
 	BYTE* pixelTemp = pixels;
-	while (LUT[(x)+y1*width] == PEL_HOLE) {
+	while (LUT[(x)+y1*width] == PEL_UNFILLED) {
 		y1--; d1++;
 		if (y1 <= 0) {
 			p1 = 0;
@@ -111,7 +119,7 @@ float getPv(int* LUT, BYTE* pixels, int x, int y, int width, int height, int pix
 		}
 
 	}
-	while (LUT[(x)+y2*width] == PEL_HOLE) {
+	while (LUT[(x)+y2*width] == PEL_UNFILLED) {
 		y2++; d2++;
 		if (y2 >= height) {
 			p2 = 0;
@@ -142,7 +150,7 @@ float getPd(int* LUT, BYTE* pixels, int x, int y, int width, int height, int pix
 	int y1, y2; y1 = y2 = y; int d1 = 0, d2 = 0; int x1 = x, x2 = x;
 	BYTE p1 = 1, p2 = 1;
 	BYTE* pixelTemp = pixels;
-	while (LUT[(x1)+y1*width] == PEL_HOLE) {
+	while (LUT[(x1)+y1*width] == PEL_UNFILLED) {
 		y1--; x1++; d1++;
 		if (x1 >= width || y1<0) {
 			p1 = 0;
@@ -150,7 +158,7 @@ float getPd(int* LUT, BYTE* pixels, int x, int y, int width, int height, int pix
 		}
 
 	}
-	while (LUT[(x2)+y2*width] == PEL_HOLE) {
+	while (LUT[(x2)+y2*width] == PEL_UNFILLED) {
 		x2--; y2++; d2++;
 		if (x2 < 0 || y2 >= height) {
 			p2 = 0;
@@ -182,7 +190,7 @@ float getPr(int* LUT, BYTE* pixels, int x, int y, int width, int height, int pix
 	int y1, y2; y1 = y2 = y; int d1 = 0, d2 = 0; int x1 = x, x2 = x;
 	BYTE p1 = 1, p2 = 1;
 	BYTE* pixelTemp = pixels;
-	while (LUT[(x1)+y1*width] == PEL_HOLE) {
+	while (LUT[(x1)+y1*width] == PEL_UNFILLED) {
 		y1--; x1--; d1++;
 		if (x1 < 0 || y1 < 0) {
 			p1 = 0;
@@ -190,7 +198,7 @@ float getPr(int* LUT, BYTE* pixels, int x, int y, int width, int height, int pix
 		}
 
 	}
-	while (LUT[(x2)+y2*width] == PEL_HOLE) {
+	while (LUT[(x2)+y2*width] == PEL_UNFILLED) {
 		x2++; y2++; d2++;
 		if (x2 >= width || y2 >= height) {
 			p2 = 0;

@@ -7,7 +7,13 @@
 #include "FrameInfo.h"
 #include "FrameInterpolation.h"
 #include "FrameInterpol_fbClassify.h"
+#include "FrameInterpolation_FB_DP.h"
 //#include "./FBClassify/FBClassifier.h"
+
+using namespace std;
+using namespace cv;
+
+#define SAD_WEIGHT	0
 
 class FrameRateUpConverter
 {
@@ -56,6 +62,95 @@ public:
 		sprintf(nextFrame_path, "%s/%d.%s", load_directory, idx + 2, save_extension);
 		sprintf(postFrame_path, "%s/%d.%s", load_directory, idx + 4, save_extension);
 	}
+	void do_fruc_with_fb_dp() {
+		FrameInterpolFBDP fruc_fbdp;
+		FrameInterpolation base_interpolator;
+		FBClassifier fbClassifier;
+		path_setup(m_file_idx);
+
+
+		curFrame = imread(curFrame_path);
+		nextFrame = imread(nextFrame_path);
+		fruc_fbdp.init(curFrame.cols, curFrame.rows);
+
+		Mat prevYFrame = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0)),
+			postYFrame = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
+		Mat prevFrame = imread(prevFrame_path);
+		Mat postFrame = imread(postFrame_path);
+		if (prevFrame.data == NULL && curFrame.data != NULL && nextFrame.data != NULL) {
+			Mat interpol = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
+			int nCols = curFrame.cols / frameInfo.getBlkWidth(), nRows = curFrame.rows / frameInfo.getBlkHeight();
+			frameInfo.motion_estimate(curFrame, nextFrame);
+			//assign frames for next sequnce
+			
+			m_file_idx += m_frame_interval;
+			path_setup(m_file_idx);
+			cout << "Frame Interpolated :: " << m_file_idx << endl;
+			curFrame = imread(curFrame_path);
+			nextFrame = imread(nextFrame_path);
+			prevFrame = imread(prevFrame_path);
+			cvtColor(prevFrame, prevFrame, CV_BGR2YUV);
+			postFrame = imread(postFrame_path);
+			cvtColor(postFrame, postFrame, CV_BGR2YUV);
+			ColorConverter::YUV2Y(prevFrame, prevYFrame);
+			ColorConverter::YUV2Y(postFrame, postYFrame);
+		}
+		while (prevFrame.data != NULL && curFrame.data != NULL && nextFrame.data != NULL && postFrame.data != NULL) {
+			Mat interpol = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(255));
+			int nCols = curFrame.cols / frameInfo.getBlkWidth(), nRows = curFrame.rows / frameInfo.getBlkHeight();
+			//1. motion estimate with correction
+			
+			frameInfo.motion_estimate(curFrame, nextFrame);
+			//2. classify from forward or backward
+			fbClassifier.setTable(curFrame.cols, curFrame.rows);
+			fbClassifier.classify(prevYFrame, frameInfo.getCurYFrame(), frameInfo.getNextYFrame(), postYFrame,
+				curFrame.cols, curFrame.rows, 5, 5);
+			/*
+			fbClassifier.classify(	(const BYTE*)prevYFrame.data, (const BYTE*)frameInfo.getCurYFrameData(), 
+									(const BYTE*)frameInfo.getNextYFrameData(), (const BYTE*)postYFrame.data,
+									curFrame.cols, curFrame.rows, 3, 5);
+			*/
+			
+			//3. motion vector correction
+			// TODO: this version's mv correction(smoothing) is in motion estimation stage
+
+			//4. motion vector map generation
+			
+			Mat mvfx = frameInfo.get_motion_vector_map(nCols, nRows, curFrame.cols, true, true, 0.5);
+			Mat mvfy = frameInfo.get_motion_vector_map(nCols, nRows, curFrame.cols, true, false, 0.5);
+			Mat mvbx = frameInfo.get_motion_vector_map(nCols, nRows, curFrame.cols, false, true, 0.5);
+			Mat mvby = frameInfo.get_motion_vector_map(nCols, nRows, curFrame.cols, false, false, 0.5);
+			
+			//5. sad map generation
+			Mat sadF = frameInfo.get_sad_map(nCols, nRows, curFrame.cols, true);
+			Mat sadB = frameInfo.get_sad_map(nCols, nRows, curFrame.cols, false);
+			//6. frame interpolation
+			fruc_fbdp.basic_interpolation(interpol.data, prevYFrame.data, frameInfo.getCurYFrameData(), frameInfo.getNextYFrameData(), postYFrame.data,
+				mvfx.data, mvfy.data, mvbx.data, mvby.data, 
+				sadF.data, sadB.data, curFrame.cols, curFrame.rows,
+				frameInfo.getBlkWidth(), frameInfo.getBlkHeight(), m_frame_interval, fbClassifier, SAD_WEIGHT, true, true);
+			
+			
+			
+			
+			imwrite(interpol_path, interpol);
+			//7. assign frames for next sequnce
+			m_file_idx += m_frame_interval;
+			path_setup(m_file_idx);
+			cout << "Frame Interpolated :: " << m_file_idx << endl;
+			curFrame = imread(curFrame_path);
+			nextFrame = imread(nextFrame_path);
+			Mat prevFrame = imread(prevFrame_path);
+			cvtColor(prevFrame, prevFrame, CV_BGR2YUV);
+			Mat postFrame = imread(postFrame_path);
+			if (postFrame.data == NULL)
+				break;
+			cvtColor(postFrame, postFrame, CV_BGR2YUV);
+			ColorConverter::YUV2Y(prevFrame, prevYFrame);
+			ColorConverter::YUV2Y(postFrame, postYFrame);
+		}
+	}
+
 	void do_fruc_with_fbclassify() {
 		FrameInterpolation_FBClassify interpolator;
 		FrameInterpolation base_interpolator;

@@ -1,11 +1,11 @@
 #pragma once
 
-#define PEL_OCCLUSION	0
+#define PEL_OCCLUSION	-1
 #define PEL_FILLED	1
 #define PEL_FILLED_FROM_FORWARD	2
 #define PEL_FILLED_FROM_BACKWARD	3
 #define PEL_HOLE	4
-#define PEL_UNFILLED	-1
+#define PEL_UNFILLED	0
 #define PEL_FILLED_BY_BDHI	5
 
 #define OCCLUSION	1

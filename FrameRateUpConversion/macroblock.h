@@ -12,7 +12,10 @@ class MacroBlockData {
 	VECTOR vector;
 public:
 	MacroBlockData() : x(0), y(0), w(0), h(0) {}
-	MacroBlockData(int _x, int _y, int _w, int _h) { this->x = _x; this->y = _y; this->w = _w; this->h = _h; vector.coord[0] = _x; vector.coord[1] = _y; }
+	MacroBlockData(int _x, int _y, int _w, int _h) { 
+		this->x = _x; this->y = _y; this->w = _w; this->h = _h; 
+		vector.coord[0] = _x; vector.coord[1] = _y; vector.sad = INT_MAX; 
+	}
 	~MacroBlockData() {}
 	inline int initialize(int _x, int _y, int _w, int _h) { 
 		this->x = _x; this->y = _y; this->w = _w; this->h = _h; 

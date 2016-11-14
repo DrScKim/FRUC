@@ -79,7 +79,7 @@ public:
 						if (!isAvailableRange(x, y, dx, dy, blkW, blkH, frameW, frameH)) 
 							continue;
 						int SAD = calcSAD(srcFrame + x + (y *frameW), dstFrame + x + dx + (y + dy)*frameW, blkW, blkH, frameW);
-						if (m_mbs[blkIdx].GetSAD() > SAD && SAD > 3) {
+						if (m_mbs[blkIdx].GetSAD() > SAD) {
 							m_mbs[blkIdx].updateMV(dx, dy, SAD);
 						}
 					}
@@ -87,7 +87,11 @@ public:
 			}
 		}
 		// TODO: PMV
-		//PMVS::smoothing(m_mbs, frameW / blkW, frameH / blkH, 3);
+
+
+		
+
+		PMVS::smoothing(m_mbs, frameW / blkW, frameH / blkH, 8);
 		return DONE;
 	}
 };

@@ -51,7 +51,56 @@ public:
 	int* getTable() { return m_table; }
 	int* getUVTable() { return m_uvTable; }
 	
-	void classify(const BYTE* prev, const BYTE* src, const BYTE* ref, const BYTE* post, int width, int height, int threshold1, int threhold2) {
+	void classify(Mat &prev, Mat &src, Mat &ref, Mat& post, int width, int height, uint8 threshold1, uint8 threshold2) {
+		Mat diffCur, diffPrev, diffPost;
+		cv::absdiff(src, ref, diffCur);
+		cv::absdiff(prev, src, diffPrev);
+		cv::absdiff(ref, post, diffPost);
+		/*
+		imshow("prev", prev);
+		imshow("src", src);
+		imshow("ref", ref);
+		imshow("post", post);
+		imshow("diffCur", diffCur);
+		imshow("diffPrev", diffPrev);
+		imshow("diffPost", diffPost);
+		waitKey(0);
+		*/
+
+
+		int idx = 0;
+		int i = 0, j = 0;
+		for (int h = 0; h < height; h++) {
+			for (int w = 0; w < width; w++) {
+				int coord = idx + w;
+				if (diffCur.data[w + h*width] < threshold1) {
+					m_table[w + h*width] = SG_BACKGROUND;
+					i++;
+				}
+				else {
+					if (diffPrev.data[w + h*width] > threshold2 && diffPost.data[w + h*width] < threshold2) {// + + - 
+						m_table[w + h*width] = SG_BACKGROUND_FROM_FORWARD;
+					}
+					if (diffPrev.data[w + h*width] < threshold2 && diffPost.data[w + h*width] < threshold2) {// - + -	in or out 
+						m_table[w + h*width] = SG_FOR_AVERAGING;
+					}
+					if (diffPrev.data[w + h*width] < threshold2 && diffPost.data[w + h*width] > threshold2) {// - + +
+						m_table[w + h*width] = SG_BACKGROUND_FROM_BACKWARD;
+					}
+					if (diffPrev.data[w + h*width] > threshold2 && diffPost.data[w + h*width] > threshold2) {// + + + action!
+						m_table[w + h*width] = SG_FOR_BLENDING;
+					}
+					j++;
+				}
+
+			}
+			idx += height;
+		}
+		
+	}
+
+
+	void classify(const BYTE* prev, const BYTE* src, const BYTE* ref, const BYTE* post, int width, int height, uint8 threshold1, uint8 threhold2) {
 		
 
 		BYTE* diffCur = new BYTE[width* height];
@@ -74,7 +123,7 @@ public:
 		for (int h = 0; h < height; h++) {
 			for (int w = 0; w < width; w++) {
 				int coord = idx + w;
-				if (diffCur[w + h*width] < threshold1) {
+				if ((int)diffCur[w + h*width] < threshold1) {
 					m_table[w + h*width] = SG_BACKGROUND;
 					i++;
 				}

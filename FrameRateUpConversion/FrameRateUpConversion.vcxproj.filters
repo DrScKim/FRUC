@@ -117,6 +117,15 @@
     <ClInclude Include="FrameInterpolation_FB_DP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="save_y.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="MVRefiner.h">
+      <Filter>Macroblock</Filter>
+    </ClInclude>
+    <ClInclude Include="IPHI.h">
+      <Filter>HoleProcess</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

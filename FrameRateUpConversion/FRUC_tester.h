@@ -26,6 +26,15 @@ inline void blur(char* result, char* blur, char* gt) {
 	cout << "Blur PSNR : " << psnr << endl;
 	
 }
+
+inline void test_fruc_fb_dp(int idx, char* load_dir, char* save_dir, char* file_ext,
+	int blkSizeW, int blkSizeH, int searchRange, int frame_interval, int overlap_size) {
+	FrameRateUpConverter converter;
+	converter.setup(blkSizeW, blkSizeH, searchRange, frame_interval, overlap_size, idx, load_dir, save_dir, file_ext);
+	converter.do_fruc_with_fb_dp();
+	
+}
+
 inline void test_frucnn_fb(char* prev, char* cur, char* next, char* post, char* frucnn, char* gt, char* result) {
 	Mat curYFrame = imread(cur);
 	Mat nextYFrame = imread(next);
@@ -74,7 +83,7 @@ inline void test_frame_interpolation_fbClassify(int idx, char* load_dir, char* s
 
 }
 
-inline void makeGroundTruth(int idx, char* load_dir, char* save_dir, char* file_ext) {
+inline void makeGroundTruth(int idx, char* load_dir, char* save_dir, char* file_ext, float scale=1.0) {
 	char save_directory[_MAX_PATH];
 	char load_directory[_MAX_PATH];
 	char save_filename[_MAX_PATH];
@@ -95,15 +104,19 @@ inline void makeGroundTruth(int idx, char* load_dir, char* save_dir, char* file_
 		curYFrame = Mat(Size(curFrame.cols, curFrame.rows), CV_8UC1, Scalar(0));
 		ColorConverter::BGR2YUV(curFrame, curFrame);
 		ColorConverter::YUV2Y(curFrame, curYFrame);
+
+		cv::resize(curYFrame, curYFrame, cv::Size(curYFrame.cols*scale, curYFrame.rows*scale), 0, 0, CV_INTER_CUBIC);
+
 		imwrite(saveFrame_path, curYFrame);
 		idx+=2;
+
 		sprintf(curFrame_path, "%s/%d.%s", load_directory, idx, save_extension);
 		sprintf(saveFrame_path, "%s/%d.%s", save_directory, idx, save_extension);
 		curFrame = imread(curFrame_path);
 	}
 }
 
-inline void checkPSNR(int idx, char* gt_folder, char* check_folder, char* file_ext) {
+inline void checkPSNR(int idx, char* gt_folder, char* check_folder, char* file_ext, float scale=1.0, bool isBorderRemove=false, int borderX=0, int borderY=0) {
 	char gt_directory[_MAX_PATH];
 	char ch_directory[_MAX_PATH];
 	char gt_path[_MAX_PATH];
@@ -119,7 +132,14 @@ inline void checkPSNR(int idx, char* gt_folder, char* check_folder, char* file_e
 	gtFrame = imread(gt_path);
 	chFrame = imread(ch_path);
 	while (gtFrame.data != NULL && chFrame.data != NULL) {
-		cout << "idx." << save_extension << " PSNR : " << getPSNRFrame(gtFrame, chFrame) << endl;
+		if (scale != 1.0)
+			cv::resize(chFrame, chFrame, cv::Size(chFrame.cols*scale, chFrame.rows*scale), 0, 0, CV_INTER_CUBIC);
+
+		//cout << "idx." << save_extension << " PSNR :\t" << getPSNRFrame(gtFrame, chFrame) << endl;
+		if (isBorderRemove == false)
+			cout << getPSNRFrame(gtFrame, chFrame) << endl;
+		else
+			cout << getPSNRFrame(gtFrame, chFrame, borderX, borderY) << endl;
 		idx += 2;
 
 		sprintf(gt_path, "%s/%d.%s", gt_directory, idx, save_extension);

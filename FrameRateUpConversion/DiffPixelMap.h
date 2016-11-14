@@ -17,6 +17,11 @@ public:
 		m_diffPixelMap = new uchar[width*height];
 		memset(m_diffPixelMap, 0, sizeof(int) * m_width * m_height);
 	}
+	DiffPixelMap(int width, int height, uchar* ref_frame, uchar* src_frame, uchar* mvxMap, uchar* mvyMap) : m_width(width), m_height(height) {
+		m_diffPixelMap = new uchar[width*height];
+		memset(m_diffPixelMap, 0, sizeof(uchar) * m_width * m_height);
+		calc_diff_pixel_map(ref_frame, src_frame, mvxMap, mvyMap);
+	}
 	~DiffPixelMap() {
 		if (m_diffPixelMap) {
 			delete[]  m_diffPixelMap;
@@ -27,20 +32,27 @@ public:
 	}
 	
 	inline void calc_diff_pixel_map(uchar* ref_frame, uchar* src_frame, uchar* mvxMap, uchar* mvyMap) {
+		/*			frame sequence is source -> reference		*/
 		uchar* mvx = mvxMap; uchar* mvy = mvyMap;
 		for (int y = 0; y < m_height; y++) {
-			#pragma parallel omp for
+			//#pragma parallel omp for
 			for (int x = 0; x < m_width; x++) {
-				int vx = mvx[x] - 128;
-				int vy = mvy[x] - 128;
+
+
+				int vx = mvx[x] - 127;
+				int vy = mvy[x] - 127;
 				int ridx = vx + x + (y + vy)*m_width;
 				int sidx = x + y + m_width;
-				m_diffPixelMap[x] = std::abs(src_frame[sidx] - ref_frame[ridx]);
+
+				m_diffPixelMap[x] = std::abs((src_frame[sidx] - ref_frame[ridx]));
 			}
 			mvx += m_width;
 			mvy += m_width;
 		}
 	}
+
+
+
 	uchar* getDiffPixelMap() {
 		return m_diffPixelMap;
 	}

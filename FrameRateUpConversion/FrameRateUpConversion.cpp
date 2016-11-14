@@ -7,6 +7,55 @@
 #include "TrainDataGenerator.h"
 int _tmain(int argc, _TCHAR* argv[])
 {
+	int blkSize = 32;
+	/*
+	makeGroundTruth(0, "d:/fruc_bench/akiyo/1/orig/frame", "d:/fruc_bench/akiyo/1/half/y_frame", "png", 0.5);
+	makeGroundTruth(1, "d:/fruc_bench/akiyo/1/orig/gt", "d:/fruc_bench/akiyo/1/half/y_gt", "png", 0.5);
+	makeGroundTruth(0, "d:/fruc_bench/akiyo/1/orig/frame", "d:/fruc_bench/akiyo/1/orig/y_frame", "png");
+	makeGroundTruth(1, "d:/fruc_bench/akiyo/1/orig/gt", "d:/fruc_bench/akiyo/1/orig/y_gt", "png");
+
+	makeGroundTruth(0, "d:/fruc_bench/bridge/1/orig/frame", "d:/fruc_bench/bridge/1/half/y_frame", "png", 0.5);
+	makeGroundTruth(1, "d:/fruc_bench/bridge/1/orig/gt", "d:/fruc_bench/bridge/1/half/y_gt", "png", 0.5);
+	makeGroundTruth(0, "d:/fruc_bench/bridge/1/orig/frame", "d:/fruc_bench/bridge/1/orig/y_frame", "png");
+	makeGroundTruth(1, "d:/fruc_bench/bridge/1/orig/gt", "d:/fruc_bench/bridge/1/orig/y_gt", "png");
+
+	makeGroundTruth(0, "d:/fruc_bench/coastguard/1/orig/frame", "d:/fruc_bench/coastguard/1/half/y_frame", "png", 0.5);
+	makeGroundTruth(1, "d:/fruc_bench/coastguard/1/orig/gt", "d:/fruc_bench/coastguard/1/half/y_gt", "png", 0.5);
+	makeGroundTruth(0, "d:/fruc_bench/coastguard/1/orig/frame", "d:/fruc_bench/coastguard/1/orig/y_frame", "png");
+	makeGroundTruth(1, "d:/fruc_bench/coastguard/1/orig/gt", "d:/fruc_bench/coastguard/1/orig/y_gt", "png");
+
+	makeGroundTruth(0, "d:/fruc_bench/foreman/1/orig/frame", "d:/fruc_bench/foreman/1/half/y_frame", "png", 0.5);
+	makeGroundTruth(1, "d:/fruc_bench/foreman/1/orig/gt", "d:/fruc_bench/foreman/1/half/y_gt", "png", 0.5);
+	makeGroundTruth(0, "d:/fruc_bench/foreman/1/orig/frame", "d:/fruc_bench/foreman/1/orig/y_frame", "png");
+	makeGroundTruth(1, "d:/fruc_bench/foreman/1/orig/gt", "d:/fruc_bench/foreman/1/orig/y_gt", "png");
+
+	makeGroundTruth(0, "d:/fruc_bench/mobile/1/orig/frame", "d:/fruc_bench/mobile/1/half/y_frame", "png", 0.5);
+	makeGroundTruth(1, "d:/fruc_bench/mobile/1/orig/gt", "d:/fruc_bench/mobile/1/half/y_gt", "png", 0.5);
+	makeGroundTruth(0, "d:/fruc_bench/mobile/1/orig/frame", "d:/fruc_bench/mobile/1/orig/y_frame", "png");
+	makeGroundTruth(1, "d:/fruc_bench/mobile/1/orig/gt", "d:/fruc_bench/mobile/1/orig/y_gt", "png");
+	
+	makeGroundTruth(0, "d:/fruc_bench/stefan/1/orig/frame", "d:/fruc_bench/stefan/1/half/y_frame", "png", 0.5);
+	makeGroundTruth(1, "d:/fruc_bench/stefan/1/orig/gt", "d:/fruc_bench/stefan/1/half/y_gt", "png", 0.5);
+	makeGroundTruth(0, "d:/fruc_bench/stefan/1/orig/frame", "d:/fruc_bench/stefan/1/orig/y_frame", "png");
+	makeGroundTruth(1, "d:/fruc_bench/stefan/1/orig/gt", "d:/fruc_bench/stefan/1/orig/y_gt", "png");
+	*/
+
+	
+	//test_fruc_fb_dp(1, "d:/fruc_bench/mobile/1/orig/frame", "d:/fruc_bench/mobile/1/half/fruc_srcnn", "png", blkSize, blkSize, 32, 2, 0);
+	/*
+	test_fruc_fb_dp(1, "d:/fruc_bench/coastguard/1/half/frame", "d:/fruc_bench/coastguard/1/half/fruc", "png", 16, 16, 16, 2, 0);
+
+	test_fruc_fb_dp(1, "d:/fruc_bench/akiyo/1/half/frame", "d:/fruc_bench/akiyo/1/half/fruc", "png", 16, 16, 32, 2, 0);
+	test_fruc_fb_dp(1, "d:/fruc_bench/bridge/1/half/frame", "d:/fruc_bench/bridge/1/half/fruc", "png", blkSize, blkSize, 16, 2, 0);
+	
+	test_fruc_fb_dp(1, "d:/fruc_bench/mobile/1/half/frame", "d:/fruc_bench/mobile/1/half/fruc", "png", blkSize, blkSize, 16, 2, 0);
+	
+	test_fruc_fb_dp(1, "d:/fruc_bench/stefan/1/half/frame", "d:/fruc_bench/stefan/1/half/fruc", "png", blkSize, blkSize, 16, 2, 0);
+	*/
+	test_fruc_fb_dp(1, "d:/fruc_bench/coastguard/1/orig/frame", "d:/fruc_bench/coastguard/1/orig/fruc", "png", 16, 16, 32, 2, 0);
+	checkPSNR(4, "d:/fruc_bench/coastguard/1/orig/y_gt", "d:/fruc_bench/coastguard/1/orig/fruc", "png", 1.0, false, 0, 0);
+	
+	//test_fruc_fb_dp(1, "d:/fruc_bench/mobile/1/orig/frame", "d:/fruc_bench/mobile/1/orig/fruc1", "png", blkSize, blkSize, 64, 2, 0);
 	//test_frame_interpolation_fbClassify(286, "d:/mvmap_db/1", "d:/phd/fruc/1", "png", 16, 16, 32, 2, 0);
 	
 	//test_frame_interpolation(286, "d:/mvmap_db/1", "d:/phd/fruc/1", "png", 16, 16, 32, 2, 0);
@@ -20,75 +69,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	//makeGroundTruth(11610, "d:/mvmap_db/5", "d:/phd/fruc/5/gt", "png");
 
 	//checkPSNR(287, "d:/phd/fruc/1/gt", "d:/phd/fruc/1", "png");
-	test_frucnn_fb("d:/phd/fruc/1/gt/336.png", "d:/phd/fruc/1/gt/338.png", "d:/phd/fruc/1/gt/340.png", "d:/phd/fruc/1/gt/342.png", "d:/phd/fruc/1/BLUR.png", "d:/phd/fruc/1/gt/339.png", "d:/phd/fruc/1/result.png");
+	//test_frucnn_fb("d:/phd/fruc/1/gt/336.png", "d:/phd/fruc/1/gt/338.png", "d:/phd/fruc/1/gt/340.png", "d:/phd/fruc/1/gt/342.png", "d:/phd/fruc/1/BLUR.png", "d:/phd/fruc/1/gt/339.png", "d:/phd/fruc/1/result.png");
+	//test_fruc_fb_dp(286, "d:/mvmap_db/1", "d:/phd/fruc/1", "png", 16, 16, 64, 2, 0);
+	
 	//blur("d:/phd/fruc/1/result.png", "d:/phd/fruc/1/BLUR.png", "d:/phd/fruc/1/gt/315.png");
 }
 
 											
 
-
-/*
-mvmap_gen(286, 8, 8, "d:/mvmap_db/1", "d:/mv_map_cnn/1/mvmap", 64, 1.0, 0.5, 2, 1, WRTIE_INTER_MV_MAP);
-mvmap_gt_gen(286, 8, 8, "d:/mvmap_db/1", "d:/mv_map_cnn/1/mvmap_gt", 32, 1.0, 2, 1, WRTIE_INTER_MV_MAP);
-avgimg_gen(286, "d:/mvmap_db/1", "d:/mv_map_cnn/1/avg", 2);
-
-mvmap_gen(2202, 8, 8, "d:/mvmap_db/2", "d:/mv_map_cnn/2/mvmap", 64, 1.0, 0.5, 2, 1, WRTIE_INTER_MV_MAP);
-mvmap_gt_gen(2202, 8, 8, "d:/mvmap_db/2", "d:/mv_map_cnn/2/mvmap_gt", 32, 1.0, 2, 1, WRTIE_INTER_MV_MAP);
-avgimg_gen(2202, "d:/mvmap_db/2", "d:/mv_map_cnn/2/avg", 2);
-
-mvmap_gen(2436, 8, 8, "d:/mvmap_db/3", "d:/mv_map_cnn/3/mvmap", 64, 1.0, 0.5, 2, 1, WRTIE_INTER_MV_MAP);
-mvmap_gt_gen(2436, 8, 8, "d:/mvmap_db/3", "d:/mv_map_cnn/3/mvmap_gt", 32, 1.0, 2, 1, WRTIE_INTER_MV_MAP);
-avgimg_gen(2436, "d:/mvmap_db/3", "d:/mv_map_cnn/3/avg", 2);
-
-mvmap_gen(4046, 8, 8, "d:/mvmap_db/4", "d:/mv_map_cnn/4/mvmap", 64, 1.0, 0.5, 2, 1, WRTIE_INTER_MV_MAP);
-mvmap_gt_gen(4046, 8, 8, "d:/mvmap_db/4", "d:/mv_map_cnn/4/mvmap_gt", 32, 1.0, 2, 1, WRTIE_INTER_MV_MAP);
-avgimg_gen(4046, "d:/mvmap_db/4", "d:/mv_map_cnn/4/avg", 2);
-
-mvmap_gen(11610, 8, 8, "d:/mvmap_db/5", "d:/mv_map_cnn/5/mvmap", 64, 1.0, 0.5, 2, 1, WRTIE_INTER_MV_MAP);
-mvmap_gt_gen(11610, 8, 8, "d:/mvmap_db/5", "d:/mv_map_cnn/5/mvmap_gt", 32, 1.0, 2, 1, WRTIE_INTER_MV_MAP);
-avgimg_gen(11610, "d:/mvmap_db/5", "d:/mv_map_cnn/5/avg", 2);
-
-mvmap_gen(3352, 8, 8, "d:/mvmap_db/8", "d:/mv_map_cnn/8/mvmap", 64, 1.0, 0.5, 2, 1, WRTIE_INTER_MV_MAP);
-mvmap_gt_gen(3352, 8, 8, "d:/mvmap_db/8", "d:/mv_map_cnn/8/mvmap_gt", 32, 1.0, 2, 1, WRTIE_INTER_MV_MAP);
-avgimg_gen(3352, "d:/mvmap_db/8", "d:/mv_map_cnn/8/avg", 2);
-*/
-
-/*
-mvmapgen(2202, 8, 8, "d:/mvmap_db/2", "d:/mvmap_db/2/mvmap", 64);
-mvmap_gen(2202, 8, 8, "d:/mvmap_db/2", "d:/mvmap_db/2/mvmap_downscale", 32, 0.5f);
-avgimg_gen(2202, "d:/mvmap_db/2", "d:/mvmap_db/2/avg");
-cout << "2 set done" << endl;
-
-mvmap_gen(2436, 8, 8, "d:/mvmap_db/3", "d:/mvmap_db/3/mvmap", 64);
-mvmap_gen(2436, 8, 8, "d:/mvmap_db/3", "d:/mvmap_db/3/mvmap_downscale", 32, 0.5f);
-avgimg_gen(2436, "d:/mvmap_db/3", "d:/mvmap_db/3/avg");
-cout << "3 set done" << endl;
-
-mvmap_gen(4046, 8, 8, "d:/mvmap_db/4", "d:/mvmap_db/4/mvmap", 64);
-mvmap_gen(4046, 8, 8, "d:/mvmap_db/4", "d:/mvmap_db/4/mvmap_downscale", 32, 0.5f);
-avgimg_gen(4046, "d:/mvmap_db/4", "d:/mvmap_db/4/avg");
-cout << "4 set done" << endl;
-
-mvmap_gen(11610, 8, 8, "d:/mvmap_db/5", "d:/mvmap_db/5/mvmap", 64);
-mvmap_gen(11610, 8, 8, "d:/mvmap_db/5", "d:/mvmap_db/5/mvmap_downscale", 32, 0.5f);
-avgimg_gen(11610, "d:/mvmap_db/5", "d:/mvmap_db/5/avg");
-cout << "5 set done" << endl;
-*/
-/*
-mvmap_gen(6609, 8, 8, "d:/mvmap_db/6", "d:/mvmap_db/6/mvmap", 128);
-mvmap_gen(6603, 8, 8, "d:/mvmap_db/6", "d:/mvmap_db/6/mvmap_downscale", 64, 0.5f);
-avgimg_gen(6603, "d:/mvmap_db/6", "d:/mvmap_db/6/avg");
-cout << "6 set done" << endl;
-*/
-/*
-mvmap_gen(1188, 8, 8, "d:/mvmap_db/7", "d:/mvmap_db/7/mvmap", 128);
-mvmap_gen(1167, 8, 8, "d:/mvmap_db/7", "d:/mvmap_db/7/mvmap_downscale", 64, 0.5f);
-avgimg_gen(1167, "d:/mvmap_db/7", "d:/mvmap_db/7/avg");
-cout << "7 set done" << endl;
-*/
-/*
-mvmap_gen(3352, 8, 8, "d:/mvmap_db/8", "d:/mvmap_db/8/mvmap", 128);
-mvmap_gen(3352, 8, 8, "d:/mvmap_db/8", "d:/mvmap_db/8/mvmap_downscale", 64, 0.5f);
-avgimg_gen(3352, "d:/mvmap_db/8", "d:/mvmap_db/8/avg");
-cout << "8 set done" << endl;
-*/

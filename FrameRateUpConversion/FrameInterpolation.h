@@ -89,10 +89,10 @@ protected:
 		int idx = 0;
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				m_FMVX[idx + x] = (forward_mvX[idx + x] - 128) / frameInterval;
-				m_FMVY[idx + x] = (forward_mvY[idx + x] - 128) / frameInterval;
-				m_BMVX[idx + x] = (forward_mvX[idx + x] - 128) / frameInterval;
-				m_BMVY[idx + x] = (forward_mvY[idx + x] - 128) / frameInterval;
+				m_FMVX[idx + x] = round((forward_mvX[idx + x] - 127) / frameInterval);
+				m_FMVY[idx + x] = round((forward_mvY[idx + x] - 127) / frameInterval);
+				m_BMVX[idx + x] = round((forward_mvX[idx + x] - 127) / frameInterval);
+				m_BMVY[idx + x] = round((forward_mvY[idx + x] - 127) / frameInterval);
 			}
 			idx += width;
 		}

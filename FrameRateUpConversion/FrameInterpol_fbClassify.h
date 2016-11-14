@@ -17,7 +17,7 @@ protected:
 				int cl = fb_table[idx + x];
 				switch (cl) {
 				case SG_BACKGROUND:
-					OUT_interpolFrame[idx + x] = prevFrame[idx + x];//(prevFrame[idx + x] /2) + (nextFrame[idx + x] /2);
+					OUT_interpolFrame[idx + x] = (prevFrame[idx + x]+nextFrame[idx + x]) >> 1;//prevFrame[idx + x];
 					m_occ_n_hole_Mask_F[idx + x] = 0;
 					m_occ_n_hole_Mask_B[idx + x] = 0;
 					m_hole_table[idx + x] = 2;
@@ -33,14 +33,53 @@ protected:
 					case SG_BACKGROUND_FROM_FORWARD:
 					OUT_interpolFrame[idx + x] = nextFrame[idx + x];
 					m_occ_n_hole_Mask_F[idx + x] = 0;
+					m_hole_table[idx + x] = 2;
 					l++;
 					break;
+					
 				case SG_FOR_AVERAGING:
 					OUT_interpolFrame[idx + x] = (prevFrame[idx + x] >> 1) + (nextFrame[idx + x] >> 1);
 					m_occ_n_hole_Mask[idx + x] = 0;
 					j++;
 					break;
 					*/
+				default:
+					;
+				}
+			}
+			idx += frameWidth;
+		}
+	}
+	void fillbackground2(uchar* OUT_interpolFrame, uchar* prevFrame, uchar* srcFrame, uchar* refFrame, uchar* postFrame,
+		FBClassifier& fbClassifier, int frameWidth, int frameHeight) {
+		int* fb_table = fbClassifier.getTable();
+		int idx = 0;
+		for (int y = 0; y < frameHeight; y++) {
+			for (int x = 0; x < frameWidth; x++) {
+				int cl = fb_table[idx + x];
+				switch (cl) {
+					
+				case SG_BACKGROUND:
+					
+					OUT_interpolFrame[idx + x] = (srcFrame[idx + x] + refFrame[idx + x]) >> 1;//prevFrame[idx + x];
+					m_occ_n_hole_Mask_F[idx + x] = 0;
+					m_occ_n_hole_Mask_B[idx + x] = 0;
+					m_hole_table[idx + x] = 2;
+					
+					break;
+					
+				case SG_BACKGROUND_FROM_BACKWARD:
+					OUT_interpolFrame[idx + x] = (prevFrame[idx + x]+srcFrame[idx+x]) >> 1;
+					m_occ_n_hole_Mask_B[idx + x] = 0;
+					m_hole_table[idx + x] = 2;
+				break;
+
+				case SG_BACKGROUND_FROM_FORWARD:
+					OUT_interpolFrame[idx + x] = (postFrame[idx + x]+refFrame[idx+x]) >> 1;
+					m_occ_n_hole_Mask_F[idx + x] = 0;
+					m_hole_table[idx + x] = 2;
+				break;
+
 				default:
 					;
 				}

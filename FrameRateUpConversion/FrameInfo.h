@@ -46,6 +46,8 @@ public:
 		m_searchRange = searchRange < 0 ? 1 : searchRange;
 		m_searchRange = searchRange >= 128 ? 128 : searchRange;
 	}
+	Mat getCurYFrame() { return curYframe; }
+	Mat getNextYFrame() { return nextYframe; }
 	uchar* getCurYFrameData() { return curYframe.data; }
 	uchar* getNextYFrameData() { return nextYframe.data; }
 
@@ -77,8 +79,9 @@ public:
 
 	}
 
-	Mat get_sad_map(int nCols, int nRows, int frameW, bool isForward, float mv_scale = 1.0) {
+	Mat get_sad_map(int nCols, int nRows, int frameW, bool isForward) {
 		Mat output = Mat(Size(nCols*m_blkW, nRows*m_blkH), CV_8UC1, Scalar(0));
+		#pragma parallel omp for
 		for (int i = 0; i < nCols; i++) {
 			for (int j = 0; j < nRows; j++) {
 				vector<MacroBlockData>* mbs;
@@ -96,7 +99,7 @@ public:
 	Mat get_motion_vector_map(int nCols, int nRows, int frameW, bool isForward, bool isHorizontal, float mv_scale = 1.0) {
 
 		Mat output = Mat(Size(nCols*m_blkW, nRows*m_blkH), CV_8UC1, Scalar(0));
-		
+		#pragma parallel omp for
 		for (int i = 0; i < nCols; i++) {
 			for (int j = 0; j < nRows; j++) {
 				vector<MacroBlockData>* mbs;
@@ -106,9 +109,9 @@ public:
 					int y = iter->Y();
 					int value = 0;
 					if (isHorizontal)
-						value = iter->GetMV().x * mv_scale + 128;
+						value = (int)round(iter->GetMV().x * mv_scale) + 127;
 					else
-						value = iter->GetMV().y * mv_scale + 128;
+						value = (int)round(iter->GetMV().y * mv_scale) + 127;
 					setPixel(output, x, y, value, m_blkW, m_blkH, frameW);
 					
 				}
